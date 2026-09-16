@@ -9,6 +9,7 @@ Single-file HTML + Supabase + GitHub Pages. Offline-first, dwibahasa (ID/EN).
 | File | Fungsi |
 |---|---|
 | `reset.sql` | Hapus semua tabel — untuk mulai bersih dari nol |
+| `patch-3d.sql` | Policy tambahan untuk kehadiran sesi & pembuatan sesi grup |
 | `seed-modules.sql` | 18 gerakan tambahan + 5 modul fokus |
 | `seed-programs.sql` | Program 12 minggu × 3 level, dimuat aplikasi dari database |
 | `muscle-base.png`, `muscle-index.png` | Peta otot — tubuh abu-abu + peta indeks kelompok otot |
@@ -155,7 +156,18 @@ Tiap modul menampilkan kalimat jujur tentang apa yang benar-benar terjadi — mi
 bahwa latihan betis membesarkan betis berotot, dan lemak perut tidak hilang oleh
 latihan perut. Ini disengaja: harapan yang tepat membuat orang bertahan lebih lama.
 
-## Berikutnya (Tahap 3D)
+## Tahap 3D — lapisan grup
+
+Jalankan **`patch-3d.sql`**.
+
+Tab **Grup** menampilkan centang disiplin mingguan tiap anggota — hanya untuk yang
+menyalakan izin di Atur → Privasi. Yang terlihat hanya selesai/tidak, tidak pernah
+isi catatan makan, beban latihan, tidur, atau kebiasaan.
+
+Sesi bersama memakai Jitsi Meet lewat tautan (mikrofon mati saat masuk). Admin bisa
+menjadwalkan sesi; tiap anggota menandai kehadirannya sendiri.
+
+## Berikutnya
 
 Pustaka gerakan & program dipindah dari kode ke database, peta otot, modul fokus,
 serta lapisan grup (status disiplin, sesi bersama).

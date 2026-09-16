@@ -301,6 +301,31 @@
     </div>
   </div>
 
+  <!-- GRUP -->
+  <div class="view" id="v-grup">
+    <h1 data-t="grup">Grup</h1>
+    <div class="sub" id="grup-sub"></div>
+
+    <div class="card">
+      <h2 data-t="disiplin_minggu">Disiplin Minggu Ini</h2>
+      <div id="grup-anggota"></div>
+      <div class="faint" style="margin-top:12px" data-t="grup_ket"></div>
+    </div>
+
+    <div class="card">
+      <h2 data-t="sesi_bersama">Sesi Bersama</h2>
+      <div id="sesi-daftar"></div>
+      <div id="sesi-admin" style="display:none">
+        <div class="row" style="border-top:1px solid var(--line);flex-wrap:wrap;gap:8px">
+          <input type="date" id="ses-tgl" style="width:auto;flex:1;min-width:130px">
+          <input type="time" id="ses-jam" style="width:110px">
+        </div>
+        <input type="text" id="ses-judul" placeholder="Latihan bareng" style="margin-top:8px">
+        <button class="btn ghost" id="ses-buat" data-t="buat_sesi">Buat sesi</button>
+      </div>
+    </div>
+  </div>
+
   <!-- PROGRES -->
   <div class="view" id="v-prog">
     <h1 data-t="progres">Progres</h1>
@@ -374,6 +399,12 @@
     </div>
 
     <div class="card">
+      <h2 data-t="alat_saya">Alat yang saya punya</h2>
+      <div class="opts row" id="alat-pilih" style="margin-top:6px"></div>
+      <div class="faint" style="margin-top:8px" data-t="alat_ket"></div>
+    </div>
+
+    <div class="card">
       <h2 data-t="privasi">Privasi</h2>
       <div class="row">
         <div><div class="t" data-t="izin_grup">Teman satu grup boleh melihat status disiplin saya</div>
@@ -428,6 +459,7 @@
 
 <div class="tabs" id="tabs" style="display:none">
   <button class="tab on" data-view="v-today"><span class="ic">📋</span><span data-t="tab_hari">Hari Ini</span></button>
+  <button class="tab" data-view="v-grup"><span class="ic">👥</span><span data-t="tab_grup">Grup</span></button>
   <button class="tab" data-view="v-prog"><span class="ic">📈</span><span data-t="tab_progres">Progres</span></button>
   <button class="tab" data-view="v-set"><span class="ic">⚙️</span><span data-t="tab_atur">Atur</span></button>
 </div>
@@ -479,7 +511,15 @@ const T = {
   kebiasaan_dilacak:"Yang dilacak", simpan:"Simpan",
   kebiasaan_format:"Format: nama:satuan:langkah — dipisah koma. Contoh: rokok:batang:1, alkohol:ml:50. Satuan dan langkah boleh dikosongkan (mis. \"kopi\" saja).",
   tampilan:"Tampilan", ikut_sistem:"Ikut sistem", gelap:"Gelap", terang:"Terang", data:"Data",
-  tab_hari:"Hari Ini", tab_progres:"Progres", tab_atur:"Atur",
+  tab_hari:"Hari Ini", tab_grup:"Grup", tab_progres:"Progres", tab_atur:"Atur",
+  disiplin_minggu:"Disiplin Minggu Ini", sesi_bersama:"Sesi Bersama",
+  grup_ket:"Yang terlihat hanya centang selesai/tidak — bukan isi catatan makan, beban latihan, tidur, atau kebiasaan. Anggota yang mematikan izin tidak muncul di sini.",
+  buat_sesi:"Buat sesi", gabung:"Gabung", hadir:"Hadir", belum_sesi:"Belum ada sesi terjadwal.",
+  sendiri:"Belum ada anggota lain yang berbagi status.", anda:"Anda",
+  sesi_ket:"Mikrofon mati saat masuk. Nyalakan sendiri bila perlu bicara.",
+  pengganti:"Pengganti %s — menyesuaikan alat yang Anda punya",
+  perlu_alat:"Perlu alat: %s — belum ada penggantinya",
+  alat_saya:"Alat yang saya punya", alat_ket:"Program menyesuaikan otomatis setelah diubah.",
   offline:"Offline — tersimpan di perangkat", nunggu:"%n menunggu sinkron",
   macet:"%n gagal terkirim — buka Atur", macet_s:"macet", antre:"antre", coba_lagi:"Coba lagi", buang:"Buang yang macet",
   latihan_selesai:"✓ Latihan Selesai", tandai:"Tandai Latihan Selesai",
@@ -524,7 +564,15 @@ const T = {
   kebiasaan_dilacak:"What to track", simpan:"Save",
   kebiasaan_format:"Format: name:unit:step — comma separated. Example: cigarettes:sticks:1, alcohol:ml:50. Unit and step are optional (e.g. just \"coffee\").",
   tampilan:"Appearance", ikut_sistem:"Follow system", gelap:"Dark", terang:"Light", data:"Data",
-  tab_hari:"Today", tab_progres:"Progress", tab_atur:"Settings",
+  tab_hari:"Today", tab_grup:"Group", tab_progres:"Progress", tab_atur:"Settings",
+  disiplin_minggu:"Consistency This Week", sesi_bersama:"Group Sessions",
+  grup_ket:"Only done/not-done ticks are visible — never meal notes, training loads, sleep or habits. Members who switch the permission off do not appear here.",
+  buat_sesi:"Create session", gabung:"Join", hadir:"Attended", belum_sesi:"No sessions scheduled yet.",
+  sendiri:"No other member is sharing their status yet.", anda:"You",
+  sesi_ket:"Your microphone starts muted. Unmute yourself when you need to speak.",
+  pengganti:"Replaces %s — matched to your equipment",
+  perlu_alat:"Needs equipment: %s — no substitute available",
+  alat_saya:"Equipment I have", alat_ket:"The program adjusts automatically once changed.",
   offline:"Offline — saved on device", nunggu:"%n waiting to sync",
   macet:"%n failed to send — open Settings", macet_s:"stuck", antre:"queued", coba_lagi:"Retry", buang:"Discard stuck",
   latihan_selesai:"✓ Workout Done", tandai:"Mark Workout Done",
@@ -1097,11 +1145,16 @@ function daftarGerak(){
     const day=P.days.find(d=>d.minggu===mg && d.hari===hari);
     const items=day?(P.byDay[day.id]||[]):[];
     if(items.length) return {tipe, dbDay:day, list:items.map(it=>{
-      const ex=it.exercises||{};
-      return {id:it.exercise_id, nama:ex.nama||(GERAK[it.exercise_id]||{}).n,
+      let ex=it.exercises||{}, id=it.exercise_id, diganti=null, kurang=null;
+      if(!alatCukup(ex.alat_dibutuhkan)){
+        const alt=cariPengganti(it);
+        if(alt){ diganti=ex.nama; ex=alt; id=alt.id; }
+        else kurang=(ex.alat_dibutuhkan||[]).join(", ");
+      }
+      return {id, nama:ex.nama||(GERAK[id]||{}).n,
               set:it.set_count, rep:it.rep_text,
               bw:!((ex.alat_dibutuhkan||[]).includes("dumbbell")||(ex.alat_dibutuhkan||[]).includes("bar_plate")),
-              kg:(GERAK[it.exercise_id]||{}).kg,
+              kg:(GERAK[id]||{}).kg, diganti, kurang,
               primer:ex.otot_primer||[], sekunder:ex.otot_sekunder||[]};})};
   }
   const lvl=state.profil.level||"easy";
@@ -1150,7 +1203,10 @@ function renderToday(){
       for(let i=1;i<=it.set;i++){const s=setKey(ex,i,"program");
         dots+=`<div class="dot ${s&&s.selesai?"on":""}" data-ex="${ex}" data-set="${i}">${s&&s.selesai?"✓":i}</div>`;}
       const beban=(setKey(ex,1,"program")||{}).beban_kg ?? it.kg ?? "";
-      d.innerHTML=`<div class="exh"><div class="exn">${L(it.nama)}</div><div class="ext">${it.set}×${it.rep}</div></div>
+      const catatan = it.diganti
+        ? `<div class="faint" style="margin-top:3px">${t("pengganti").replace("%s",L(it.diganti))}</div>`
+        : it.kurang ? `<div class="faint" style="margin-top:3px;color:var(--accent)">${t("perlu_alat").replace("%s",it.kurang)}</div>` : "";
+      d.innerHTML=`<div class="exh"><div class="exn">${L(it.nama)}</div><div class="ext">${it.set}×${it.rep}</div></div>${catatan}
         <div class="exr">${it.bw?`<span class="ext">${t("tanpa_beban")}</span>`
           :`<input type="number" step="0.5" class="mini" style="width:74px" data-beban="${ex}" value="${beban}"><span class="ext">${t("kg_tangan")}</span>`}
         <div class="dots">${dots}</div></div>
@@ -1383,6 +1439,35 @@ function bersihkanKunciLama(){
 // =====================================================================
 // MODUL FOKUS — ditempel di akhir sesi, pilihan per hari
 // =====================================================================
+async function muatPustaka(){
+  try{
+    const {data}=await sb.from("exercises").select("id,pattern_id,nama,level,alat_dibutuhkan,otot_primer,otot_sekunder");
+    state.pustaka=data||[];
+    await cacheSet("pustaka",state.pustaka);
+  }catch(e){ state.pustaka=await cacheGet("pustaka")||[]; }
+}
+
+// Alat yang dimiliki pengguna. "tidak_ada" berarti benar-benar tanpa alat.
+function alatSaya(){
+  const a=state.profil.alat_dimiliki||[];
+  return a.filter(x=>x!=="tidak_ada");
+}
+function alatCukup(perlu){
+  const punya=alatSaya();
+  return (perlu||[]).every(x=>punya.includes(x));
+}
+// Cari pengganti dari POLA GERAKAN yang sama supaya struktur latihan tidak berubah.
+function cariPengganti(item){
+  const kandidat=(state.pustaka||[]).filter(e=>
+    e.pattern_id===item.pattern_id && e.id!==item.exercise_id && alatCukup(e.alat_dibutuhkan));
+  if(!kandidat.length) return null;
+  const urut={easy:1,medium:2,hard:3};
+  const lvl=urut[state.profil.level==="pro"?"hard":state.profil.level]||1;
+  // pilih yang levelnya paling dekat dan tidak melebihi kemampuan
+  kandidat.sort((a,b)=>Math.abs((urut[a.level]||1)-lvl)-Math.abs((urut[b.level]||1)-lvl));
+  return kandidat[0];
+}
+
 async function muatModul(){
   try{
     const {data:mods}=await sb.from("modules").select("*");
@@ -1447,6 +1532,113 @@ function renderModul(){
     renderModul();
   });
   isi.querySelectorAll("[data-info]").forEach(el=>el.onclick=()=>bukaInfo(el.dataset.info));
+}
+
+
+// =====================================================================
+// GRUP — hanya membaca daily_status (centang), bukan isi catatan apa pun
+// =====================================================================
+async function renderGrup(){
+  if(!state.siap) return;
+  const sub=document.getElementById("grup-sub");
+  const box=document.getElementById("grup-anggota");
+  if(!state.grup){ sub.textContent=""; box.innerHTML=`<div class="faint">${t("sendiri")}</div>`; return; }
+  sub.textContent=state.grup.nama_group;
+
+  const sen=senin(new Date()), tglMinggu=[...Array(7)].map((_,i)=>fmt(addH(sen,i)));
+  let anggota=[],status=[];
+  try{
+    const {data:mem}=await sb.from("memberships").select("user_id").eq("status","aktif");
+    const ids=(mem||[]).map(m=>m.user_id);
+    const {data:prof}=await sb.from("profiles").select("id,nama,level").in("id",ids);
+    anggota=prof||[];
+    const {data:st}=await sb.from("daily_status").select("*")
+      .in("user_id",anggota.map(a=>a.id))
+      .gte("tanggal",tglMinggu[0]).lte("tanggal",tglMinggu[6]);
+    status=st||[];
+    await cacheSet("grup-status",{anggota,status});
+  }catch(e){
+    const cch=await cacheGet("grup-status");
+    if(cch){anggota=cch.anggota;status=cch.status;}
+  }
+
+  if(!anggota.length){ box.innerHTML=`<div class="faint">${t("sendiri")}</div>`; return; }
+  const hariSingkat=lang==="id"?["Sen","Sel","Rab","Kam","Jum","Sab","Min"]
+                               :["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+  const hariIni=fmt(new Date());
+  box.innerHTML = anggota.sort((a,b)=>(a.id===state.user.id?-1:b.id===state.user.id?1:0))
+   .map(a=>{
+    const sel=status.filter(s=>s.user_id===a.id);
+    const titik=tglMinggu.map((tg,i)=>{
+      const s=sel.find(x=>x.tanggal===tg);
+      const lewat = tg<=hariIni;
+      let cls="dot", isi=hariSingkat[i].slice(0,1);
+      if(s&&s.latihan_selesai){cls+=" on"; isi="✓";}
+      else if(s&&(s.makan_tercatat||s.langkah_target_capai)){cls+=" part"; isi="·";}
+      else if(!lewat){cls+=""; isi=hariSingkat[i].slice(0,1);}
+      return `<div class="${cls}" style="width:26px;height:26px;font-size:11px">${isi}</div>`;
+    }).join("");
+    const jml=sel.filter(s=>s.latihan_selesai).length;
+    return `<div class="row" style="align-items:flex-start;flex-wrap:wrap;gap:6px">
+      <div style="flex:1;min-width:110px">
+        <div class="t">${a.nama||"—"}${a.id===state.user.id?` <span class="faint">(${t("anda")})</span>`:""}</div>
+        <div class="faint">${({easy:"Easy",medium:"Medium",pro:"Pro"})[a.level]||""} · ${jml} ${t("sesi_latihan")}</div>
+      </div>
+      <div style="display:flex;gap:5px">${titik}</div></div>`;
+  }).join("");
+}
+
+// ---------- sesi bersama ----------
+function ruangSesi(s){
+  const nama="segbu-"+(state.grup?state.grup.id||state.grup.nama_group:"grup")+"-"+s.tanggal;
+  return (s.room_url||("https://meet.jit.si/"+encodeURIComponent(nama.replace(/[^a-zA-Z0-9-]/g,"")))) +
+         "#config.startWithAudioMuted=true&config.prejoinPageEnabled=true";
+}
+async function renderSesi(){
+  const box=document.getElementById("sesi-daftar");
+  const adm=document.getElementById("sesi-admin");
+  adm.style.display = state.profil.role==="admin" ? "" : "none";
+  let sesi=[],hadir=[];
+  try{
+    const {data}=await sb.from("group_sessions").select("*")
+      .gte("tanggal",fmt(addH(new Date(),-1))).order("tanggal").order("jam").limit(10);
+    sesi=data||[];
+    if(sesi.length){
+      const {data:h}=await sb.from("session_attendance").select("*")
+        .in("group_session_id",sesi.map(s=>s.id));
+      hadir=h||[];
+    }
+    await cacheSet("sesi",{sesi,hadir});
+  }catch(e){ const cch=await cacheGet("sesi"); if(cch){sesi=cch.sesi;hadir=cch.hadir;} }
+
+  if(!sesi.length){ box.innerHTML=`<div class="faint">${t("belum_sesi")}</div>`; return; }
+  box.innerHTML=sesi.map(s=>{
+    const saya=hadir.find(h=>h.group_session_id===s.id&&h.user_id===state.user.id);
+    const jml=hadir.filter(h=>h.group_session_id===s.id&&h.hadir).length;
+    const d=parse(s.tanggal);
+    return `<div class="row" style="flex-wrap:wrap;gap:8px">
+      <div style="flex:1;min-width:130px">
+        <div class="t">${s.judul||t("sesi_bersama")}</div>
+        <div class="faint">${HARI[lang][d.getDay()]} ${d.getDate()} ${BULAN[d.getMonth()]} · ${(s.jam||"").slice(0,5)}${jml?` · ${jml} ${t("hadir").toLowerCase()}`:""}</div>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="small ${saya&&saya.hadir?"on":""}" data-hadir="${s.id}">${t("hadir")}</button>
+        <button class="small" data-gabung="${s.id}" style="background:var(--accent);border-color:var(--accent);color:#fff">${t("gabung")}</button>
+      </div></div>`;
+  }).join("")+`<div class="faint" style="margin-top:10px">${t("sesi_ket")}</div>`;
+
+  box.querySelectorAll("[data-gabung]").forEach(b=>b.onclick=()=>{
+    const s=sesi.find(x=>x.id===b.dataset.gabung);
+    window.open(ruangSesi(s),"_blank","noopener");
+  });
+  box.querySelectorAll("[data-hadir]").forEach(b=>b.onclick=async()=>{
+    const id=b.dataset.hadir;
+    let h=hadir.find(x=>x.group_session_id===id&&x.user_id===state.user.id);
+    const baru={id:(h&&h.id)||crypto.randomUUID(),group_session_id:id,
+                user_id:state.user.id,hadir:!(h&&h.hadir)};
+    await sb.from("session_attendance").upsert(baru);
+    renderSesi();
+  });
 }
 
 // =====================================================================
@@ -1532,6 +1724,18 @@ document.getElementById("toggle-ukuran").onclick=()=>{
   const b=document.getElementById("ukuran-lain");
   b.style.display=b.style.display==="none"?"":"none";};
 
+document.getElementById("ses-buat").onclick=async()=>{
+  const tgl=document.getElementById("ses-tgl").value;
+  const jam=document.getElementById("ses-jam").value;
+  const judul=document.getElementById("ses-judul").value.trim();
+  if(!tgl||!jam){alert(lang==="id"?"Isi tanggal dan jam.":"Please fill date and time.");return;}
+  const {error}=await sb.from("group_sessions").insert({
+    group_id:state.grup?state.grup.id:null, tanggal:tgl, jam, judul:judul||null,
+    dibuat_oleh:state.user.id});
+  if(error){alert(error.message);return;}
+  document.getElementById("ses-judul").value="";
+  renderSesi();
+};
 document.getElementById("btn-salin").onclick=async()=>{
   const teks=await buatRingkasan();
   const ta=document.getElementById("ringkasan"); ta.value=teks; ta.style.display="block";
@@ -1599,6 +1803,24 @@ function renderSet(){
   }
   tampilSync();
 }
+const DAFTAR_ALAT=[
+  {v:"kursi",     id:"Kursi & matras", en:"Chair & mat"},
+  {v:"dumbbell",  id:"Dumbbell",       en:"Dumbbells"},
+  {v:"bar_plate", id:"Bar + plate",    en:"Bar + plates"},
+  {v:"band",      id:"Resistance band",en:"Resistance band"}];
+function renderAlat(){
+  const box=document.getElementById("alat-pilih"); if(!box) return;
+  const punya=alatSaya();
+  box.innerHTML=DAFTAR_ALAT.map(a=>
+    `<button class="opt ${punya.includes(a.v)?"on":""}" data-a="${a.v}">${a[lang]||a.id}</button>`).join("");
+  box.querySelectorAll(".opt").forEach(b=>b.onclick=async()=>{
+    const v=b.dataset.a, arr=alatSaya(), i=arr.indexOf(v);
+    if(i>=0)arr.splice(i,1); else arr.push(v);
+    state.profil.alat_dimiliki=arr.length?arr:["tidak_ada"];
+    await sb.from("profiles").update({alat_dimiliki:state.profil.alat_dimiliki}).eq("id",state.user.id);
+    renderAlat(); renderToday();
+  });
+}
 async function ubahIzin(kolom,nilai){
   await sb.from("profiles").update({[kolom]:nilai}).eq("id",state.user.id);
   await sb.from("consent_log").insert({user_id:state.user.id,jenis_izin:kolom,nilai});
@@ -1640,6 +1862,7 @@ document.getElementById("sync").onclick=()=>{
 document.querySelectorAll(".tab").forEach(tb=>tb.onclick=()=>{
   document.querySelectorAll(".tab").forEach(x=>x.classList.remove("on"));
   tb.classList.add("on"); show(tb.dataset.view);
+  if(tb.dataset.view==="v-grup"){ renderGrup(); renderSesi(); }
   if(tb.dataset.view==="v-prog") renderProg();
   if(tb.dataset.view==="v-set") renderSet();
 });
@@ -1650,6 +1873,7 @@ document.querySelectorAll(".tab").forEach(tb=>tb.onclick=()=>{
 async function bukaApp(){
   await pastikanProgram();
   await muatProgram();
+  await muatPustaka();
   await muatModul();
   await muatHari();
   state.siap=true;
@@ -1657,7 +1881,7 @@ async function bukaApp(){
   document.getElementById("wrap").classList.remove("noTab");
   document.getElementById("langbox").style.display="none";
   try{
-    const {data}=await sb.from("memberships").select("group_id, token_groups(nama_group, berakhir_pada)").limit(1);
+    const {data}=await sb.from("memberships").select("group_id, token_groups(id, nama_group, berakhir_pada)").limit(1);
     if(data&&data[0]&&data[0].token_groups){ state.grup=data[0].token_groups; await cacheSet("grup",state.grup); }
   }catch(e){ state.grup=await cacheGet("grup"); }
   show("v-today"); renderToday(); renderSet(); kirim();
