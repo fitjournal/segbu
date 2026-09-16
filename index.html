@@ -218,6 +218,7 @@
         </div>
       </div>
       <div id="auth-msg"></div>
+      <button class="link" id="link-kebijakan" data-t="baca_kebijakan">Baca kebijakan data</button>
     </div>
   </div>
 
@@ -448,6 +449,43 @@
       </div>
     </div>
 
+    <div class="card" id="c-admin" style="display:none">
+      <h2 data-t="kelola_grup">Kelola Grup</h2>
+      <div id="admin-grup"></div>
+      <div class="row" style="border-top:1px solid var(--line);flex-wrap:wrap;gap:8px;align-items:flex-end">
+        <div style="flex:1;min-width:130px">
+          <label style="margin-top:0" data-t="kode_baru">Kode</label>
+          <input type="text" id="g-kode" placeholder="SEGBU-02" autocapitalize="characters">
+        </div>
+        <div style="flex:1;min-width:130px">
+          <label style="margin-top:0" data-t="nama_grup">Nama grup</label>
+          <input type="text" id="g-nama" placeholder="Tim Aquapark">
+        </div>
+      </div>
+      <div class="row" style="flex-wrap:wrap;gap:8px;align-items:flex-end">
+        <div style="flex:1;min-width:90px">
+          <label style="margin-top:0" data-t="kursi">Kursi</label>
+          <input type="number" id="g-seats" value="8" min="1" max="8">
+        </div>
+        <div style="flex:1;min-width:120px">
+          <label style="margin-top:0" data-t="periode">Periode</label>
+          <select id="g-periode">
+            <option value="1">1 bulan</option>
+            <option value="6">6 bulan</option>
+            <option value="12" selected>12 bulan</option>
+            <option value="">Tanpa batas</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn ghost" id="g-buat" data-t="buat_grup">Buat grup</button>
+      <div id="admin-msg"></div>
+    </div>
+
+    <div class="card">
+      <h2 data-t="privasi_data">Data & Privasi Anda</h2>
+      <button class="btn ghost" id="btn-kebijakan" data-t="baca_kebijakan">Baca kebijakan data</button>
+    </div>
+
     <div class="card">
       <h2 data-t="data">Data</h2>
       <div class="faint" id="sync-info">—</div>
@@ -520,6 +558,10 @@ const T = {
   pengganti:"Pengganti %s — menyesuaikan alat yang Anda punya",
   perlu_alat:"Perlu alat: %s — belum ada penggantinya",
   alat_saya:"Alat yang saya punya", alat_ket:"Program menyesuaikan otomatis setelah diubah.",
+  kelola_grup:"Kelola Grup", kode_baru:"Kode", nama_grup:"Nama grup", kursi:"Kursi",
+  periode:"Periode", buat_grup:"Buat grup", perpanjang:"+12 bulan", tutup_grup:"Tutup",
+  privasi_data:"Data & Privasi Anda", baca_kebijakan:"Baca kebijakan data",
+  kursi_terpakai:"%a dari %b kursi", tanpa_batas:"Tanpa batas", belum_mulai:"Belum dimulai",
   offline:"Offline — tersimpan di perangkat", nunggu:"%n menunggu sinkron",
   macet:"%n gagal terkirim — buka Atur", macet_s:"macet", antre:"antre", coba_lagi:"Coba lagi", buang:"Buang yang macet",
   latihan_selesai:"✓ Latihan Selesai", tandai:"Tandai Latihan Selesai",
@@ -573,6 +615,10 @@ const T = {
   pengganti:"Replaces %s — matched to your equipment",
   perlu_alat:"Needs equipment: %s — no substitute available",
   alat_saya:"Equipment I have", alat_ket:"The program adjusts automatically once changed.",
+  kelola_grup:"Manage Groups", kode_baru:"Code", nama_grup:"Group name", kursi:"Seats",
+  periode:"Period", buat_grup:"Create group", perpanjang:"+12 months", tutup_grup:"Close",
+  privasi_data:"Your Data & Privacy", baca_kebijakan:"Read data policy",
+  kursi_terpakai:"%a of %b seats", tanpa_batas:"Unlimited", belum_mulai:"Not started",
   offline:"Offline — saved on device", nunggu:"%n waiting to sync",
   macet:"%n failed to send — open Settings", macet_s:"stuck", antre:"queued", coba_lagi:"Retry", buang:"Discard stuck",
   latihan_selesai:"✓ Workout Done", tandai:"Mark Workout Done",
@@ -1724,6 +1770,22 @@ document.getElementById("toggle-ukuran").onclick=()=>{
   const b=document.getElementById("ukuran-lain");
   b.style.display=b.style.display==="none"?"":"none";};
 
+document.getElementById("btn-kebijakan").onclick=bukaKebijakan;
+document.getElementById("link-kebijakan").onclick=bukaKebijakan;
+document.getElementById("g-buat").onclick=async()=>{
+  const kode=document.getElementById("g-kode").value.trim().toUpperCase();
+  const nama=document.getElementById("g-nama").value.trim();
+  const seats=parseInt(document.getElementById("g-seats").value,10)||8;
+  const per=document.getElementById("g-periode").value;
+  if(!kode||!nama){pesan("admin-msg",lang==="id"?"Isi kode dan nama grup.":"Fill in code and group name.");return;}
+  const {error}=await sb.from("token_groups").insert({
+    kode, nama_group:nama, max_seats:Math.min(8,Math.max(1,seats)),
+    periode_bulan: per===""?null:parseInt(per,10), dibuat_oleh:state.user.id});
+  if(error){pesan("admin-msg",error.message);return;}
+  pesan("admin-msg",lang==="id"?"Grup dibuat. Bagikan kodenya.":"Group created. Share the code.","ok");
+  document.getElementById("g-kode").value=""; document.getElementById("g-nama").value="";
+  renderAdmin();
+};
 document.getElementById("ses-buat").onclick=async()=>{
   const tgl=document.getElementById("ses-tgl").value;
   const jam=document.getElementById("ses-jam").value;
@@ -1801,23 +1863,51 @@ function renderSet(){
       ?new Date(state.grup.berakhir_pada).toLocaleDateString(lang==="id"?"id-ID":"en-GB")
       :(lang==="id"?"Tanpa batas":"Unlimited");
   }
+  renderAlat();
+  renderAdmin();
   tampilSync();
 }
 const DAFTAR_ALAT=[
-  {v:"kursi",     id:"Kursi & matras", en:"Chair & mat"},
-  {v:"dumbbell",  id:"Dumbbell",       en:"Dumbbells"},
-  {v:"bar_plate", id:"Bar + plate",    en:"Bar + plates"},
-  {v:"band",      id:"Resistance band",en:"Resistance band"}];
+ {v:"kursi", id:"Kursi & matras", en:"Chair & mat",
+  spek:{id:"Kursi biasa yang kokoh tanpa roda, tinggi dudukan 40-45 cm. Matras opsional — handuk tebal cukup.",
+        en:"A sturdy chair without wheels, seat height 40-45 cm. A mat is optional — a thick towel works."},
+  beli:{id:"Sudah ada di rumah.", en:"You already have one."}},
+
+ {v:"band", id:"Resistance band", en:"Resistance band",
+  spek:{id:"Band tabung panjang dengan pegangan, atau loop panjang 2 meter. Pilih yang sedang (15-25 kg) — bukan mini band pipih untuk kaki.",
+        en:"A long tube band with handles, or a 2 m long loop. Pick medium resistance (15-25 kg) — not the flat mini band."},
+  beli:{id:"± Rp40.000-80.000. Paling murah, dan satu-satunya yang membuka seluruh pola tarik.", en:"Cheapest option, and the only one that unlocks every pulling movement."}},
+
+ {v:"dumbbell", id:"Dumbbell", en:"Dumbbells",
+  spek:{id:"Sepasang, bukan satuan. Untuk pemula: 2×3 kg dan 2×5 kg. Kalau hanya mampu satu pasang, ambil 5 kg. Lebih baik lagi yang bisa dibongkar-pasang.",
+        en:"A pair, not a single. For beginners: 2×3 kg and 2×5 kg. If only one pair, take 5 kg. Adjustable ones are better still."},
+  beli:{id:"± Rp60.000-100.000 per kg untuk yang berlapis karet.", en:"Rubber-coated ones cost more but protect floors."}},
+
+ {v:"bar_plate", id:"Bar + plate", en:"Bar + plates",
+  spek:{id:"Bar lurus 1,2-1,5 m dengan plate bisa dilepas. Kombinasi awal yang berguna: 2×1,25 kg, 2×2,5 kg, 2×5 kg, 2×10 kg — total sekitar 40 kg.",
+        en:"A straight 1.2-1.5 m bar with removable plates. A useful starting set: 2×1.25, 2×2.5, 2×5, 2×10 kg — about 40 kg total."},
+  beli:{id:"Investasi jangka panjang. Baru berguna setelah beban dumbbell terasa terlalu ringan.", en:"A long-term investment. Only worth it once dumbbells feel too light."}}
+];
 function renderAlat(){
   const box=document.getElementById("alat-pilih"); if(!box) return;
   const punya=alatSaya();
-  box.innerHTML=DAFTAR_ALAT.map(a=>
-    `<button class="opt ${punya.includes(a.v)?"on":""}" data-a="${a.v}">${a[lang]||a.id}</button>`).join("");
+  box.className="opts";
+  box.innerHTML=DAFTAR_ALAT.map(a=>{
+    const on=punya.includes(a.v);
+    return `<button class="opt ${on?"on":""}" data-a="${a.v}" style="line-height:1.5">
+      <div style="display:flex;justify-content:space-between;gap:8px">
+        <strong>${a[lang]||a.id}</strong><span style="color:var(--faint)">${on?"✓":"+"}</span>
+      </div>
+      <div class="faint" style="margin-top:4px">${L(a.spek)}</div>
+      <div class="faint" style="margin-top:3px;color:var(--accent)">${L(a.beli)}</div>
+    </button>`;}).join("");
   box.querySelectorAll(".opt").forEach(b=>b.onclick=async()=>{
     const v=b.dataset.a, arr=alatSaya(), i=arr.indexOf(v);
     if(i>=0)arr.splice(i,1); else arr.push(v);
     state.profil.alat_dimiliki=arr.length?arr:["tidak_ada"];
-    await sb.from("profiles").update({alat_dimiliki:state.profil.alat_dimiliki}).eq("id",state.user.id);
+    const {error}=await sb.from("profiles")
+      .update({alat_dimiliki:state.profil.alat_dimiliki}).eq("id",state.user.id);
+    if(error) alert(error.message);
     renderAlat(); renderToday();
   });
 }
@@ -1847,6 +1937,149 @@ function pasangTema(){
   if(v==="auto") document.documentElement.removeAttribute("data-theme");
   else document.documentElement.setAttribute("data-theme",v);
   document.querySelectorAll("[data-theme]").forEach(b=>b.classList.toggle("on",b.dataset.theme===v));
+}
+
+
+// =====================================================================
+// PANEL ADMIN — mengelola grup tanpa perlu SQL
+// =====================================================================
+async function renderAdmin(){
+  const kartu=document.getElementById("c-admin");
+  if(!kartu) return;
+  if(state.profil.role!=="admin"){ kartu.style.display="none"; return; }
+  kartu.style.display="";
+  const box=document.getElementById("admin-grup");
+  let grup=[],anggota=[];
+  try{
+    const {data:g}=await sb.from("token_groups").select("*").order("created_at");
+    grup=g||[];
+    const {data:m}=await sb.from("memberships").select("group_id,user_id,status");
+    anggota=m||[];
+  }catch(e){ box.innerHTML=`<div class="msg err">${e.message}</div>`; return; }
+
+  box.innerHTML = grup.map(g=>{
+    const pakai=anggota.filter(m=>m.group_id===g.id&&m.status==="aktif").length;
+    const habis=g.berakhir_pada
+      ? new Date(g.berakhir_pada).toLocaleDateString(lang==="id"?"id-ID":"en-GB")
+      : (g.periode_bulan? t("belum_mulai") : t("tanpa_batas"));
+    return `<div class="row" style="flex-wrap:wrap;gap:8px">
+      <div style="flex:1;min-width:140px">
+        <div class="t"><strong>${g.kode}</strong></div>
+        <div class="faint">${g.nama_group} · ${t("kursi_terpakai").replace("%a",pakai).replace("%b",g.max_seats)} · ${habis}</div>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="small" data-panjang="${g.id}">${t("perpanjang")}</button>
+        <button class="small" data-salin="${g.kode}">${t("salin").split(" ")[0]}</button>
+      </div></div>`;
+  }).join("") || `<div class="faint">—</div>`;
+
+  box.querySelectorAll("[data-panjang]").forEach(b=>b.onclick=async()=>{
+    const g=grup.find(x=>x.id===b.dataset.panjang);
+    const dasar=g.berakhir_pada?new Date(g.berakhir_pada):new Date();
+    dasar.setMonth(dasar.getMonth()+12);
+    const {error}=await sb.from("token_groups")
+      .update({berakhir_pada:dasar.toISOString(), mulai_pada:g.mulai_pada||new Date().toISOString()})
+      .eq("id",g.id);
+    if(error) alert(error.message); else renderAdmin();
+  });
+  box.querySelectorAll("[data-salin]").forEach(b=>b.onclick=async()=>{
+    try{ await navigator.clipboard.writeText(b.dataset.salin);
+         b.textContent=t("tersalin"); setTimeout(()=>renderAdmin(),1500);}catch(e){}
+  });
+}
+
+
+// =====================================================================
+// KEBIJAKAN DATA — ditulis untuk dibaca pengguna, bukan pengacara
+// =====================================================================
+const KEBIJAKAN = {
+ id:`<h3>Data & Privasi Anda</h3>
+  <p style="font-size:14px">Ditulis sesederhana mungkin supaya benar-benar terbaca.</p>
+
+  <h2 style="margin-top:16px">Apa yang disimpan</h2>
+  <ul style="font-size:14px;line-height:1.7">
+    <li>Nama, email, jenis kelamin, tanggal lahir, tinggi badan</li>
+    <li>Jawaban kuesioner awal dan skrining kesehatan</li>
+    <li>Catatan latihan, langkah, tidur, berat & ukuran tubuh, catatan makan</li>
+    <li>Kebiasaan yang Anda pilih sendiri untuk dilacak (bila modul itu dinyalakan)</li>
+  </ul>
+
+  <h2 style="margin-top:16px">Siapa yang bisa melihat</h2>
+  <ul style="font-size:14px;line-height:1.7">
+    <li><strong>Anda</strong> — semuanya.</li>
+    <li><strong>Teman satu grup</strong> — hanya centang selesai/tidak per hari, dan hanya
+        bila Anda menyalakan izinnya. Isi catatan makan, beban latihan, jam tidur,
+        dan kebiasaan tidak pernah terlihat.</li>
+    <li><strong>Admin</strong> — hanya bila Anda menyalakan izinnya, dan terbatas pada
+        ringkasan progres atau detail latihan sesuai izin yang Anda pilih.</li>
+  </ul>
+
+  <h2 style="margin-top:16px">Yang tidak pernah bisa dilihat siapa pun</h2>
+  <p style="font-size:14px"><strong>Jawaban skrining kesehatan Anda.</strong> Ini dikunci di
+  tingkat database, bukan sekadar disembunyikan di tampilan — bahkan admin tidak punya
+  jalan untuk membacanya. Alasannya sederhana: skrining hanya berguna bila dijawab jujur,
+  dan orang hanya jujur bila yakin tidak dibaca orang lain.</p>
+
+  <h2 style="margin-top:16px">Mencabut izin</h2>
+  <p style="font-size:14px">Semua izin bisa dimatikan kapan saja di halaman Pengaturan,
+  satu ketukan, tanpa perlu minta ke siapa pun. Mematikan izin langsung berlaku saat itu juga.</p>
+
+  <h2 style="margin-top:16px">Menghapus data</h2>
+  <p style="font-size:14px">Anda berhak meminta seluruh data Anda dihapus. Sampaikan ke
+  pengelola aplikasi, dan data akan dihapus permanen beserta akunnya.</p>
+
+  <h2 style="margin-top:16px">Batas aplikasi ini</h2>
+  <p style="font-size:14px">Aplikasi ini memberikan panduan latihan umum dan
+  <strong>bukan pengganti nasihat medis</strong>. Hentikan latihan bila muncul nyeri tajam,
+  pusing, atau nyeri dada, dan hubungi tenaga medis. Bila Anda punya kondisi kesehatan,
+  konsultasikan ke dokter sebelum memulai.</p>`,
+
+ en:`<h3>Your Data & Privacy</h3>
+  <p style="font-size:14px">Written as plainly as possible so it actually gets read.</p>
+
+  <h2 style="margin-top:16px">What is stored</h2>
+  <ul style="font-size:14px;line-height:1.7">
+    <li>Name, email, gender, date of birth, height</li>
+    <li>Your onboarding answers and health screening</li>
+    <li>Workout logs, steps, sleep, weight & measurements, meal notes</li>
+    <li>Habits you chose to track yourself (if that module is on)</li>
+  </ul>
+
+  <h2 style="margin-top:16px">Who can see it</h2>
+  <ul style="font-size:14px;line-height:1.7">
+    <li><strong>You</strong> — everything.</li>
+    <li><strong>Group members</strong> — only daily done/not-done ticks, and only if you
+        switch the permission on. Meal notes, training loads, sleep and habits are never visible.</li>
+    <li><strong>Admin</strong> — only if you switch it on, limited to the progress summary
+        or workout detail according to the permission you chose.</li>
+  </ul>
+
+  <h2 style="margin-top:16px">What nobody can ever see</h2>
+  <p style="font-size:14px"><strong>Your health screening answers.</strong> This is locked at
+  the database level, not merely hidden in the interface — not even the admin has a path to
+  read it. The reason is simple: screening is only useful if answered honestly, and people are
+  only honest when certain no one else reads it.</p>
+
+  <h2 style="margin-top:16px">Withdrawing permission</h2>
+  <p style="font-size:14px">Every permission can be switched off at any time in Settings,
+  in one tap, without asking anyone. It takes effect immediately.</p>
+
+  <h2 style="margin-top:16px">Deleting your data</h2>
+  <p style="font-size:14px">You may ask for all your data to be deleted. Contact whoever runs
+  this app, and your data and account will be permanently removed.</p>
+
+  <h2 style="margin-top:16px">Limits of this app</h2>
+  <p style="font-size:14px">This app provides general training guidance and is
+  <strong>not a substitute for medical advice</strong>. Stop training if you feel sharp pain,
+  dizziness or chest pain, and seek medical help. If you have a health condition, consult a
+  doctor before starting.</p>`
+};
+function bukaKebijakan(){
+  const sheet=document.getElementById("sheet");
+  sheet.innerHTML = (KEBIJAKAN[lang]||KEBIJAKAN.id) +
+    `<button class="btn ghost" id="tutup-keb">${t("tutup")}</button>`;
+  document.getElementById("modal").classList.add("on");
+  document.getElementById("tutup-keb").onclick=()=>document.getElementById("modal").classList.remove("on");
 }
 
 // =====================================================================
