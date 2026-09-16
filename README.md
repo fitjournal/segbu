@@ -1,4 +1,6 @@
-# Aplikasi Latihan — Tahap 1: Fondasi
+# SegBu — Your Daily Fit Journal
+
+**Tahap 1: Fondasi** · repo `fitjournal/segbu` · tayang di https://fitjournal.github.io/segbu/
 
 Single-file HTML + Supabase + GitHub Pages. Offline-first, dwibahasa (ID/EN).
 
@@ -63,13 +65,26 @@ Jam mundur periode **baru mulai** saat anggota pertama menukar kode.
 ### 5. GitHub Pages
 
 ```bash
-git init && git add . && git commit -m "fondasi"
+git init
+git add .
+git commit -m "fondasi: auth, token grup, onboarding, skrining, offline"
 git branch -M main
-git remote add origin https://github.com/<akun>/<repo>.git
+git remote add origin https://github.com/fitjournal/segbu.git
 git push -u origin main
 ```
 
-Settings → Pages → Source: `main` / root. Tunggu 1–2 menit.
+Settings → Pages → Source: `Deploy from a branch` → `main` / `/ (root)` → Save.
+Tunggu 1–2 menit, lalu buka **https://fitjournal.github.io/segbu/**
+
+### 6. Daftarkan URL di Supabase
+
+Authentication → URL Configuration:
+
+- **Site URL**: `https://fitjournal.github.io/segbu/`
+- **Redirect URLs**: tambahkan `https://fitjournal.github.io/segbu/**`
+
+Tanpa ini, tautan konfirmasi email dan reset kata sandi akan mengarah ke
+`localhost` dan gagal dibuka.
 
 > Service worker & PWA **wajib HTTPS**. GitHub Pages sudah HTTPS.
 > Membuka file lewat `file://` tidak akan menjalankan service worker.

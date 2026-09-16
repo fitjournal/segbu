@@ -1,11 +1,14 @@
 {
-  "name": "Program Latihan",
-  "short_name": "Latihan",
+  "name": "SegBu — Your Daily Fit Journal",
+  "short_name": "SegBu",
+  "description": "Program latihan di rumah yang terukur dan bertahap.",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#14161a",
   "theme_color": "#14161a",
   "orientation": "portrait",
+  "lang": "id",
   "icons": [
     { "src": "./icon-180.png", "sizes": "180x180", "type": "image/png" },
     { "src": "./icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }

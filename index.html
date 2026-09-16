@@ -3,9 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Program Latihan</title>
+<title>SegBu — Your Daily Fit Journal</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SegBu">
 <meta name="theme-color" content="#14161a">
 <link rel="manifest" href="./manifest.json">
 <link rel="apple-touch-icon" href="./icon-180.png">
@@ -229,12 +230,16 @@
 const SUPABASE_URL      = "https://ruuktccgpwgcjjviisxe.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ1dWt0Y2NncHdnY2pqdmlpc3hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk1NTM5NTYsImV4cCI6MjEwNTEyOTk1Nn0.8KagVJu7YqhXM_9JXUZBKmeWxitBIzBICm8tIE9mXOo";
 
+// Nama aplikasi — ubah di satu tempat ini saja
+const APP_NAMA    = "SegBu";
+const APP_TAGLINE = { id: "Jurnal kebugaran harian Anda.", en: "Your daily fit journal." };
+
 // =====================================================================
 // i18n
 // =====================================================================
 const T = {
   id:{
-    memuat:"Memuat…", judul:"Program Latihan", subjudul:"Latihan di rumah, terukur, bertahap.",
+    memuat:"Memuat…", judul:APP_NAMA, subjudul:"",
     masuk:"Masuk", daftar:"Daftar", email:"Email", sandi:"Kata sandi",
     kode_grup:"Kode grup", cek_kode:"Periksa kode", nama:"Nama", buat_akun:"Buat akun",
     sandi_min:"Minimal 8 karakter.", lanjut:"Lanjut", kembali:"Kembali", keluar:"Keluar",
@@ -251,7 +256,7 @@ const T = {
     offline:"Offline — tersimpan di perangkat", nunggu:"%n menunggu sinkron", tersinkron:"Tersinkron"
   },
   en:{
-    memuat:"Loading…", judul:"Training Program", subjudul:"Home training, measured, step by step.",
+    memuat:"Loading…", judul:APP_NAMA, subjudul:"",
     masuk:"Sign in", daftar:"Register", email:"Email", sandi:"Password",
     kode_grup:"Group code", cek_kode:"Check code", nama:"Name", buat_akun:"Create account",
     sandi_min:"At least 8 characters.", lanjut:"Continue", kembali:"Back", keluar:"Sign out",
@@ -275,6 +280,8 @@ const t = k => (T[lang] && T[lang][k]) || (T.id[k] || k);
 function applyLang(){
   document.documentElement.lang = lang;
   document.querySelectorAll("[data-t]").forEach(el=>{ el.textContent = t(el.dataset.t); });
+  const sj = document.querySelector('[data-t="subjudul"]');
+  if (sj) sj.textContent = APP_TAGLINE[lang] || APP_TAGLINE.id;
   document.querySelectorAll(".lang button").forEach(b=>b.classList.toggle("on", b.dataset.lang===lang));
   if (state.step >= 0) renderOnb();
 }
