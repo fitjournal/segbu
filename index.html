@@ -378,6 +378,22 @@
     </div>
 
     <div class="card">
+      <h2 data-t="riwayat_makan">Riwayat Makan</h2>
+      <div id="makan-riwayat"></div>
+    </div>
+
+    <div class="card" id="c-habit-riwayat" style="display:none">
+      <h2 data-t="riwayat_habit">Riwayat Kebiasaan</h2>
+      <div id="habit-riwayat"></div>
+    </div>
+
+    <div class="card" id="c-pola" style="display:none">
+      <h2 data-t="pola">Pola yang Terlihat</h2>
+      <div id="pola-isi"></div>
+      <div class="faint" style="margin-top:10px" data-t="pola_ket"></div>
+    </div>
+
+    <div class="card">
       <h2 data-t="ringkasan">Ringkasan untuk Dianalisa</h2>
       <div class="faint" data-t="ringkasan_ket">Salin, lalu tempel ke chat untuk dianalisa.</div>
       <button class="btn ghost" id="btn-salin" data-t="salin">Salin Ringkasan Minggu Ini</button>
@@ -562,6 +578,13 @@ const T = {
   periode:"Periode", buat_grup:"Buat grup", perpanjang:"+12 bulan", tutup_grup:"Tutup",
   privasi_data:"Data & Privasi Anda", baca_kebijakan:"Baca kebijakan data",
   kursi_terpakai:"%a dari %b kursi", tanpa_batas:"Tanpa batas", belum_mulai:"Belum dimulai",
+  riwayat_makan:"Riwayat Makan", riwayat_habit:"Riwayat Kebiasaan", pola:"Pola yang Terlihat",
+  pola_ket:"Ini hanya pola yang terlihat dari catatan Anda, bukan sebab-akibat. Banyak hal lain ikut berpengaruh, dan data beberapa hari belum cukup untuk menyimpulkan apa pun.",
+  belum_cukup:"Belum cukup data untuk dilihat polanya. Terus catat beberapa hari lagi.",
+  malam_pakai:"Malam dengan %s", malam_tanpa:"Malam tanpa %s",
+  terbangun_persen:"%n% terbangun tengah malam", rata_tidur_jam:"rata tidur %n jam",
+  rata_kkal:"Rata-rata %n kkal/hari", makan_pertama:"pertama", makan_terakhir:"terakhir",
+  hari_tercatat:"%n hari tercatat",
   offline:"Offline — tersimpan di perangkat", nunggu:"%n menunggu sinkron",
   macet:"%n gagal terkirim — buka Atur", macet_s:"macet", antre:"antre", coba_lagi:"Coba lagi", buang:"Buang yang macet",
   latihan_selesai:"✓ Latihan Selesai", tandai:"Tandai Latihan Selesai",
@@ -619,6 +642,13 @@ const T = {
   periode:"Period", buat_grup:"Create group", perpanjang:"+12 months", tutup_grup:"Close",
   privasi_data:"Your Data & Privacy", baca_kebijakan:"Read data policy",
   kursi_terpakai:"%a of %b seats", tanpa_batas:"Unlimited", belum_mulai:"Not started",
+  riwayat_makan:"Meal History", riwayat_habit:"Habit History", pola:"Patterns Observed",
+  pola_ket:"These are patterns visible in your own log, not cause and effect. Many other factors play a part, and a few days of data cannot settle anything.",
+  belum_cukup:"Not enough data to see a pattern yet. Keep logging for a few more days.",
+  malam_pakai:"Nights with %s", malam_tanpa:"Nights without %s",
+  terbangun_persen:"%n% woke during the night", rata_tidur_jam:"avg sleep %n h",
+  rata_kkal:"Average %n kcal/day", makan_pertama:"first", makan_terakhir:"last",
+  hari_tercatat:"%n days logged",
   offline:"Offline — saved on device", nunggu:"%n waiting to sync",
   macet:"%n failed to send — open Settings", macet_s:"stuck", antre:"queued", coba_lagi:"Retry", buang:"Discard stuck",
   latihan_selesai:"✓ Workout Done", tandai:"Mark Workout Done",
@@ -1770,6 +1800,7 @@ async function renderProg(){
     tb.appendChild(tr);
   });
   state._data={metrics,logs,sesi,sets:state._sets||[]};
+  renderRiwayatLain();
 }
 async function simpanUkuran(){
   const num=id=>{const v=document.getElementById(id).value; return v===""?null:parseFloat(v);};
@@ -1889,6 +1920,125 @@ async function buatRingkasan(){
     }
   }catch(e){}
   return out.join("\n");
+}
+
+
+// =====================================================================
+// RIWAYAT MAKAN, KEBIASAAN, DAN POLA
+// Catatan penting: yang ditampilkan hanya KETERKAITAN yang terlihat di
+// catatan pengguna sendiri, bukan klaim sebab-akibat.
+// =====================================================================
+async function renderRiwayatLain(){
+  const sejak = fmt(addH(new Date(),-29));
+  let makan=[],habit=[],logs=(state._data&&state._data.logs)||[];
+  try{
+    const [mk,hb]=await Promise.all([
+      sb.from("meals").select("*").gte("tanggal",sejak).order("tanggal",{ascending:false}).order("jam"),
+      sb.from("habit_logs").select("*").gte("tanggal",sejak).order("tanggal",{ascending:false})
+    ]);
+    makan=mk.data||[]; habit=hb.data||[];
+    await cacheSet("riwayat-lain",{makan,habit});
+  }catch(e){ const c2=await cacheGet("riwayat-lain"); if(c2){makan=c2.makan;habit=c2.habit;} }
+
+  // ---- riwayat makan ----
+  const box=document.getElementById("makan-riwayat");
+  const perHari={};
+  makan.forEach(m=>{(perHari[m.tanggal]=perHari[m.tanggal]||[]).push(m);});
+  const tgls=Object.keys(perHari).sort().reverse().slice(0,14);
+  if(!tgls.length){ box.innerHTML=`<div class="faint">${t("belum_ada")}</div>`; }
+  else{
+    let totalKkal=0, hariAda=0;
+    Object.keys(perHari).forEach(tg=>{
+      totalKkal+=perHari[tg].reduce((a,b)=>a+(b.perkiraan_kkal||0),0); hariAda++;});
+    box.innerHTML=`<div class="stats" style="margin-top:0">
+        <div class="stat"><div class="n">${Math.round(totalKkal/Math.max(1,hariAda)).toLocaleString("id-ID")}</div>
+          <div class="l">≈kkal/${lang==="id"?"hari":"day"}</div></div>
+        <div class="stat"><div class="n">${hariAda}</div>
+          <div class="l">${t("hari_tercatat").replace("%n","").trim()}</div></div>
+      </div>` +
+      tgls.map(tg=>{
+        const arr=perHari[tg].slice().sort((a,b)=>(a.jam||"").localeCompare(b.jam||""));
+        const jam=arr.map(a=>(a.jam||"").slice(0,5)).filter(Boolean);
+        const kk=arr.reduce((a,b)=>a+(b.perkiraan_kkal||0),0);
+        return `<div class="row" style="align-items:flex-start">
+          <div style="flex:1">
+            <div class="t">${tg.slice(5)} · ≈${kk} kkal</div>
+            <div class="faint">${arr.map(a=>`${(a.jam||"").slice(0,5)} ${a.deskripsi}`).join(" · ")}</div>
+            ${jam.length?`<div class="faint">${t("makan_pertama")} ${jam[0]} · ${t("makan_terakhir")} ${jam[jam.length-1]}</div>`:""}
+          </div></div>`;
+      }).join("");
+  }
+
+  // ---- riwayat kebiasaan ----
+  const kartuH=document.getElementById("c-habit-riwayat");
+  const boxH=document.getElementById("habit-riwayat");
+  if(!habit.length){ kartuH.style.display="none"; }
+  else{
+    kartuH.style.display="";
+    const tipe={};
+    habit.forEach(h=>{ tipe[h.tipe]=tipe[h.tipe]||{satuan:h.satuan||"",rows:[]};
+                       tipe[h.tipe].rows.push(h); });
+    boxH.innerHTML=Object.keys(tipe).map(k=>{
+      const d=tipe[k], isi=d.rows.filter(r=>(Number(r.jumlah)||0)>0);
+      const total=isi.reduce((a,b)=>a+(Number(b.jumlah)||0),0);
+      const rata=isi.length?Math.round(total/isi.length):0;
+      const last14=d.rows.slice(0,14).reverse();
+      const maks=Math.max(1,...last14.map(r=>Number(r.jumlah)||0));
+      const batang=last14.map(r=>{
+        const v=Number(r.jumlah)||0, h=Math.max(2,Math.round(v/maks*34));
+        return `<div title="${r.tanggal}: ${v} ${d.satuan}" style="width:9px;height:${h}px;
+          background:${v?"var(--accent)":"var(--line)"};border-radius:2px"></div>`;}).join("");
+      return `<div style="padding:12px 0;border-top:1px solid var(--line)">
+        <div class="row" style="border-top:none;padding:0 0 8px">
+          <div class="t">${k}</div>
+          <div class="faint">${rata} ${d.satuan}/${lang==="id"?"hari":"day"} · ${isi.length} ${lang==="id"?"hari":"days"}</div>
+        </div>
+        <div style="display:flex;gap:3px;align-items:flex-end;height:36px">${batang}</div></div>`;
+    }).join("");
+  }
+
+  renderPola(habit, logs);
+}
+
+// Keterkaitan kebiasaan malam dengan tidur malam itu:
+// kebiasaan tanggal D dipasangkan dengan catatan tidur tanggal D+1 (pagi setelahnya).
+function renderPola(habit, logs){
+  const kartu=document.getElementById("c-pola");
+  const box=document.getElementById("pola-isi");
+  if(!habit.length){ kartu.style.display="none"; return; }
+  const tipeList=[...new Set(habit.map(h=>h.tipe))];
+  const blok=[];
+  tipeList.forEach(tp=>{
+    const pakai={n:0,bangun:0,tidur:[]}, tanpa={n:0,bangun:0,tidur:[]};
+    habit.filter(h=>h.tipe===tp).forEach(h=>{
+      const besok=fmt(addH(parse(h.tanggal),1));
+      const l=logs.find(x=>x.tanggal===besok);
+      if(!l || l.terbangun_malam===null || l.terbangun_malam===undefined) return;
+      const grup=(Number(h.jumlah)||0)>0 ? pakai : tanpa;
+      grup.n++; if(l.terbangun_malam) grup.bangun++;
+      if(l.tidur_jam!=null) grup.tidur.push(Number(l.tidur_jam));
+    });
+    if(pakai.n<3 || tanpa.n<3) return;      // terlalu sedikit untuk ditampilkan
+    const pct=g=>Math.round(g.bangun/g.n*100);
+    const avg=g=>g.tidur.length?(g.tidur.reduce((a,b)=>a+b,0)/g.tidur.length).toFixed(1):"—";
+    blok.push(`<div style="padding:12px 0;border-top:1px solid var(--line)">
+      <div class="t" style="margin-bottom:6px"><strong>${tp}</strong></div>
+      <div class="row" style="border-top:none;padding:4px 0">
+        <div class="faint">${t("malam_pakai").replace("%s",tp)} (${pakai.n})</div>
+        <div>${t("terbangun_persen").replace("%n",pct(pakai))} · ${t("rata_tidur_jam").replace("%n",avg(pakai))}</div>
+      </div>
+      <div class="row" style="border-top:none;padding:4px 0">
+        <div class="faint">${t("malam_tanpa").replace("%s",tp)} (${tanpa.n})</div>
+        <div>${t("terbangun_persen").replace("%n",pct(tanpa))} · ${t("rata_tidur_jam").replace("%n",avg(tanpa))}</div>
+      </div></div>`);
+  });
+  if(!blok.length){
+    kartu.style.display="";
+    box.innerHTML=`<div class="faint">${t("belum_cukup")}</div>`;
+    return;
+  }
+  kartu.style.display="";
+  box.innerHTML=blok.join("");
 }
 
 // =====================================================================
