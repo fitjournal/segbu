@@ -1440,7 +1440,16 @@ async function bukaInfo(exId){
   const langkah=(ex.cara_melakukan&&(ex.cara_melakukan[lang]||ex.cara_melakukan.id))||[];
   const map=await petaOtot();
   const namaOtot=a=>(a||[]).map(x=>map[x]?L(map[x].n):x).join(", ");
+  const aset = ex.animasi_url
+    ? `<video src="${ex.animasi_url}" muted playsinline loop autoplay
+         style="width:100%;border-radius:10px;margin-top:12px;background:#fff"></video>`
+    : (ex.gambar_awal||ex.gambar_akhir)
+    ? `<div style="display:flex;gap:8px;margin-top:12px">
+         ${ex.gambar_awal?`<img src="${ex.gambar_awal}" style="width:50%;border-radius:10px;background:#fff">`:""}
+         ${ex.gambar_akhir?`<img src="${ex.gambar_akhir}" style="width:50%;border-radius:10px;background:#fff">`:""}
+       </div>` : "";
   sheet.innerHTML=`<h3>${L(ex.nama)}</h3>
+    ${aset}
     <canvas id="peta-otot" style="width:100%;height:auto;display:none;margin-top:12px"></canvas>
     <div id="peta-ket" style="display:flex;gap:14px;justify-content:center;margin-top:6px;font-size:11.5px;color:var(--dim)">
       <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#e8622d;vertical-align:-1px"></span> ${t("otot_utama")}</span>
@@ -1705,8 +1714,15 @@ async function renderProg(){
       sb.from("workout_sessions").select("*").order("tanggal",{ascending:false}).limit(40)
     ]);
     metrics=m.data||[]; logs=l.data||[]; sesi=s.data||[];
-    await cacheSet("prog",{metrics,logs,sesi});
-  }catch(e){ const c=await cacheGet("prog"); if(c){metrics=c.metrics;logs=c.logs;sesi=c.sesi;} }
+    let sets=[];
+    if(sesi.length){
+      const {data:st}=await sb.from("session_sets").select("*").in("session_id",sesi.map(x=>x.id));
+      sets=st||[];
+    }
+    state._sets=sets;
+    await cacheSet("prog",{metrics,logs,sesi,sets});
+  }catch(e){ const c=await cacheGet("prog");
+    if(c){metrics=c.metrics;logs=c.logs;sesi=c.sesi;state._sets=c.sets||[];} }
 
   // tren berat
   const w=metrics.filter(x=>x.berat_kg!=null);
@@ -1753,7 +1769,7 @@ async function renderProg(){
       <td class="num">${l.tidur_jam??"—"}</td>`;
     tb.appendChild(tr);
   });
-  state._data={metrics,logs,sesi};
+  state._data={metrics,logs,sesi,sets:state._sets||[]};
 }
 async function simpanUkuran(){
   const num=id=>{const v=document.getElementById(id).value; return v===""?null:parseFloat(v);};
@@ -1807,6 +1823,8 @@ document.getElementById("btn-salin").onclick=async()=>{
   }catch(e){ ta.focus(); ta.select(); }
 };
 async function buatRingkasan(){
+  const namaGerak = {};
+  (state.pustaka||[]).forEach(e=>{ namaGerak[e.id]=L(e.nama); });
   const d=state._data||{metrics:[],logs:[],sesi:[]};
   const sen=senin(new Date()), out=[];
   out.push(`RINGKASAN MINGGU (${fmt(sen)} s/d ${fmt(addH(sen,6))})`);
@@ -1819,12 +1837,44 @@ async function buatRingkasan(){
     const m=d.metrics.find(x=>x.tanggal===tg)||{};
     out.push("");
     out.push(HARI.id[day.getDay()]+" "+day.getDate()+" "+BULAN[day.getMonth()]);
-    if(s) out.push(`- ${s.label||"Latihan"}: ${s.selesai?"selesai":"sebagian"}`);
+    if(s){
+      out.push(`- ${s.label||"Latihan"}: ${s.selesai?"selesai":"sebagian"}`);
+      const st=(d.sets||[]).filter(x=>x.session_id===s.id);
+      const prog=st.filter(x=>(x.sumber||"program")==="program");
+      const mod=st.filter(x=>x.sumber==="modul");
+      const ringkas=arr=>{
+        const per={};
+        arr.forEach(x=>{ (per[x.exercise_id]=per[x.exercise_id]||[]).push(x); });
+        return Object.keys(per).map(id=>{
+          const a=per[id], sel=a.filter(x=>x.selesai).length;
+          const beban=a.map(x=>x.beban_kg).find(x=>x!=null);
+          return `${namaGerak[id]||id} ${sel}/${a.length} set${beban!=null?` @${beban}kg`:""}`;
+        }).join("; ");
+      };
+      if(prog.length) out.push(`  latihan: ${ringkas(prog)}`);
+      if(mod.length)  out.push(`  modul: ${ringkas(mod)}`);
+    }
     if(l.langkah!=null) out.push(`- Langkah: ${l.langkah}`);
     if(l.tidur_jam!=null) out.push(`- Tidur: ${l.tidur_mulai||"?"}-${l.tidur_selesai||"?"} (${l.tidur_jam} jam)${l.terbangun_malam?" | terbangun tengah malam":""}`);
     if(m.berat_kg!=null) out.push(`- Berat: ${m.berat_kg} kg`);
     if(m.lingkar_perut!=null) out.push(`- Lingkar perut: ${m.lingkar_perut} cm`);
   }
+  try{
+    const {data:hb}=await sb.from("habit_logs").select("*")
+      .gte("tanggal",fmt(sen)).lte("tanggal",fmt(addH(sen,6))).order("tanggal");
+    if(hb&&hb.length){
+      out.push(""); out.push("KEBIASAAN");
+      const per={};
+      hb.forEach(h=>{ per[h.tipe]=per[h.tipe]||{total:0,satuan:h.satuan||"",hari:0};
+                      per[h.tipe].total+=Number(h.jumlah)||0;
+                      if((Number(h.jumlah)||0)>0) per[h.tipe].hari++; });
+      Object.keys(per).forEach(k=>{
+        const p=per[k];
+        out.push(`${k}: total ${p.total} ${p.satuan} dalam ${p.hari} hari (rata-rata ${(p.total/Math.max(1,p.hari)).toFixed(0)} ${p.satuan}/hari)`);
+      });
+    }
+  }catch(e){}
+
   try{
     const {data:mk}=await sb.from("meals").select("*")
       .gte("tanggal",fmt(sen)).lte("tanggal",fmt(addH(sen,6))).order("tanggal").order("jam");
