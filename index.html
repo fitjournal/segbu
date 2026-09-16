@@ -284,7 +284,6 @@
       <h2 data-t="makan">Makan</h2>
       <div id="meal-list"></div>
       <div class="row" style="border-top:1px solid var(--line);align-items:flex-start;flex-wrap:wrap">
-        <input type="time" id="m-jam" style="width:110px">
         <input type="text" id="m-desc" placeholder="nasi + ayam + sayur" style="flex:1;min-width:150px">
       </div>
 
@@ -307,6 +306,11 @@
         </div>
       </div>
 
+      <div class="row" style="border-top:1px solid var(--line)">
+        <div><div class="t" data-t="jam_makan">Jam makan</div>
+             <div class="faint" data-t="jam_makan_ket">Terisi otomatis jam sekarang — ubah bila mencatat belakangan.</div></div>
+        <input type="time" id="m-jam" style="width:118px">
+      </div>
       <button class="btn ghost" id="m-add" data-t="tambah_makan">Tambah catatan makan</button>
     </div>
 
@@ -600,6 +604,7 @@ const T = {
   privasi_data:"Data & Privasi Anda", baca_kebijakan:"Baca kebijakan data",
   kursi_terpakai:"%a dari %b kursi", tanpa_batas:"Tanpa batas", belum_mulai:"Belum dimulai",
   mode_cepat:"Cepat", mode_rinci:"Rinci per item",
+  jam_makan:"Jam makan", jam_makan_ket:"Terisi otomatis jam sekarang — ubah bila mencatat belakangan.",
   cari_bahan:"Ketik untuk mencari bahan", tak_ditemukan:"Tidak ditemukan — akan dicatat apa adanya",
   protein_hari:"g protein", sudah_punya:"✓ Dimiliki", riwayat_makan:"Riwayat Makan", riwayat_habit:"Riwayat Kebiasaan", pola:"Pola yang Terlihat",
   pola_ket:"Ini hanya pola yang terlihat dari catatan Anda, bukan sebab-akibat. Banyak hal lain ikut berpengaruh, dan data beberapa hari belum cukup untuk menyimpulkan apa pun.",
@@ -666,6 +671,7 @@ const T = {
   privasi_data:"Your Data & Privacy", baca_kebijakan:"Read data policy",
   kursi_terpakai:"%a of %b seats", tanpa_batas:"Unlimited", belum_mulai:"Not started",
   mode_cepat:"Quick", mode_rinci:"Item by item",
+  jam_makan:"Meal time", jam_makan_ket:"Auto-filled with the current time — change it if logging later.",
   cari_bahan:"Type to search foods", tak_ditemukan:"Not found — will be logged as typed",
   protein_hari:"g protein", sudah_punya:"✓ Owned", riwayat_makan:"Meal History", riwayat_habit:"Habit History", pola:"Patterns Observed",
   pola_ket:"These are patterns visible in your own log, not cause and effect. Many other factors play a part, and a few days of data cannot settle anything.",
@@ -1401,6 +1407,12 @@ function renderToday(){
     await sb.from("meals").delete().eq("id",id);
     state.makan=state.makan.filter(x=>x.id!==id); renderToday(); simpanStatus();
   });
+  const jamEl=document.getElementById("m-jam");
+  if(!jamEl.value){
+    const n=new Date();
+    jamEl.value=String(n.getHours()).padStart(2,"0")+":"+String(n.getMinutes()).padStart(2,"0");
+  }
+
   const pz=document.getElementById("m-porsi");
   if(!pz.dataset.init){
     pz.dataset.init="1";
@@ -1538,6 +1550,7 @@ document.getElementById("m-add").onclick=async()=>{
     await simpan("meals",row);
   }
   document.getElementById("m-desc").value="";
+  document.getElementById("m-jam").value="";   // diisi ulang otomatis oleh renderToday
   renderToday(); simpanStatus();
 };
 

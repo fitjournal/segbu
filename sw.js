@@ -1,5 +1,5 @@
 // Service worker: simpan kerangka aplikasi & aset supaya bisa dibuka offline.
-const CACHE = "fitapp-v16";
+const CACHE = "fitapp-v17";
 const INTI = ["./", "./index.html", "./manifest.json",
   "./muscle-base.png", "./muscle-index.png"];
 
