@@ -287,7 +287,26 @@
         <input type="time" id="m-jam" style="width:110px">
         <input type="text" id="m-desc" placeholder="nasi + ayam + sayur" style="flex:1;min-width:150px">
       </div>
-      <div class="opts row" id="m-porsi" style="margin-top:8px"></div>
+
+      <div class="opts row" style="margin-top:8px">
+        <button class="opt on" id="mode-cepat" data-t="mode_cepat">Cepat</button>
+        <button class="opt" id="mode-rinci" data-t="mode_rinci">Rinci per item</button>
+      </div>
+
+      <div id="blok-cepat">
+        <div class="opts row" id="m-porsi" style="margin-top:8px"></div>
+      </div>
+
+      <div id="blok-rinci" style="display:none">
+        <input type="text" id="m-cari" placeholder="cari: nasi, sate, telur…" style="margin-top:8px">
+        <div id="m-hasil" class="opts" style="margin-top:6px"></div>
+        <div id="m-item"></div>
+        <div class="stats" id="m-total" style="display:none">
+          <div class="stat"><div class="n" id="tot-kkal">0</div><div class="l">≈kkal</div></div>
+          <div class="stat"><div class="n" id="tot-protein">0</div><div class="l">g protein</div></div>
+        </div>
+      </div>
+
       <button class="btn ghost" id="m-add" data-t="tambah_makan">Tambah catatan makan</button>
     </div>
 
@@ -580,7 +599,9 @@ const T = {
   periode:"Periode", buat_grup:"Buat grup", perpanjang:"+12 bulan", tutup_grup:"Tutup",
   privasi_data:"Data & Privasi Anda", baca_kebijakan:"Baca kebijakan data",
   kursi_terpakai:"%a dari %b kursi", tanpa_batas:"Tanpa batas", belum_mulai:"Belum dimulai",
-  sudah_punya:"✓ Dimiliki", riwayat_makan:"Riwayat Makan", riwayat_habit:"Riwayat Kebiasaan", pola:"Pola yang Terlihat",
+  mode_cepat:"Cepat", mode_rinci:"Rinci per item",
+  cari_bahan:"Ketik untuk mencari bahan", tak_ditemukan:"Tidak ditemukan — akan dicatat apa adanya",
+  protein_hari:"g protein", sudah_punya:"✓ Dimiliki", riwayat_makan:"Riwayat Makan", riwayat_habit:"Riwayat Kebiasaan", pola:"Pola yang Terlihat",
   pola_ket:"Ini hanya pola yang terlihat dari catatan Anda, bukan sebab-akibat. Banyak hal lain ikut berpengaruh, dan data beberapa hari belum cukup untuk menyimpulkan apa pun.",
   belum_cukup:"Belum cukup data untuk dilihat polanya. Terus catat beberapa hari lagi.",
   malam_pakai:"Malam dengan %s", malam_tanpa:"Malam tanpa %s",
@@ -644,7 +665,9 @@ const T = {
   periode:"Period", buat_grup:"Create group", perpanjang:"+12 months", tutup_grup:"Close",
   privasi_data:"Your Data & Privacy", baca_kebijakan:"Read data policy",
   kursi_terpakai:"%a of %b seats", tanpa_batas:"Unlimited", belum_mulai:"Not started",
-  sudah_punya:"✓ Owned", riwayat_makan:"Meal History", riwayat_habit:"Habit History", pola:"Patterns Observed",
+  mode_cepat:"Quick", mode_rinci:"Item by item",
+  cari_bahan:"Type to search foods", tak_ditemukan:"Not found — will be logged as typed",
+  protein_hari:"g protein", sudah_punya:"✓ Owned", riwayat_makan:"Meal History", riwayat_habit:"Habit History", pola:"Patterns Observed",
   pola_ket:"These are patterns visible in your own log, not cause and effect. Many other factors play a part, and a few days of data cannot settle anything.",
   belum_cukup:"Not enough data to see a pattern yet. Keep logging for a few more days.",
   malam_pakai:"Nights with %s", malam_tanpa:"Nights without %s",
@@ -1369,7 +1392,7 @@ function renderToday(){
   state.makan.forEach(m=>{
     const r=document.createElement("div"); r.className="row";
     r.innerHTML=`<div><div class="t">${(m.jam||"").slice(0,5)} · ${m.deskripsi||""}</div>
-      <div class="faint">${t("porsi_"+(m.porsi||"normal"))} · ≈${m.perkiraan_kkal||0} kkal</div></div>
+      <div class="faint">${m.porsi?t("porsi_"+m.porsi)+" · ":""}≈${m.perkiraan_kkal||0} kkal${m.protein_g!=null?` · ${m.protein_g} g protein`:""}</div></div>
       <button class="small" data-del="${m.id}" style="color:var(--bad)">${t("hapus")}</button>`;
     ml.appendChild(r);
   });
@@ -1470,15 +1493,50 @@ document.getElementById("w-done").onclick=async()=>{
 };
 
 const KKAL={kecil:300,sedang:450,normal:600,banyak:800};
+document.getElementById("mode-cepat").onclick=()=>{
+  modeRinci=false;
+  document.getElementById("mode-cepat").classList.add("on");
+  document.getElementById("mode-rinci").classList.remove("on");
+  document.getElementById("blok-cepat").style.display="";
+  document.getElementById("blok-rinci").style.display="none";
+};
+document.getElementById("mode-rinci").onclick=()=>{
+  modeRinci=true;
+  document.getElementById("mode-rinci").classList.add("on");
+  document.getElementById("mode-cepat").classList.remove("on");
+  document.getElementById("blok-rinci").style.display="";
+  document.getElementById("blok-cepat").style.display="none";
+  renderDraft();
+};
+document.getElementById("m-cari").oninput=renderCari;
+
 document.getElementById("m-add").onclick=async()=>{
   const jam=document.getElementById("m-jam").value||null;
-  const desc=document.getElementById("m-desc").value.trim();
-  if(!desc){document.getElementById("m-desc").focus();return;}
-  const porsi=(document.querySelector("#m-porsi .opt.on")||{dataset:{porsi:"normal"}}).dataset.porsi;
-  const row={id:crypto.randomUUID(),user_id:state.user.id,tanggal:state.tanggal,
-             jam,deskripsi:desc,porsi,perkiraan_kkal:KKAL[porsi]};
-  state.makan.push(row);
-  await simpan("meals",row);
+  let desc=document.getElementById("m-desc").value.trim();
+
+  if(modeRinci){
+    if(!draftItem.length){ document.getElementById("m-cari").focus(); return; }
+    if(!desc) desc = draftItem.map(i=>`${i.nama} ${i.jumlah}${i.satuan?" "+i.satuan:""}`).join(", ");
+    const tot=totalDraft();
+    const row={id:crypto.randomUUID(),user_id:state.user.id,tanggal:state.tanggal,
+               jam,deskripsi:desc,porsi:null,
+               perkiraan_kkal:Math.round(tot.kkal), protein_g:Math.round(tot.protein*10)/10};
+    state.makan.push(row);
+    await simpan("meals",row);                       // induk dulu, baru itemnya
+    for(const it of draftItem){
+      await simpan("meal_items",{id:crypto.randomUUID(), meal_id:row.id, user_id:state.user.id,
+        food_id:it.food_id||null, nama_bebas:it.food_id?null:it.nama,
+        jumlah:it.jumlah, satuan:it.satuan||null, kkal:it.kkal||0, protein_g:it.protein_g||0});
+    }
+    draftItem=[]; renderDraft();
+  } else {
+    if(!desc){document.getElementById("m-desc").focus();return;}
+    const porsi=(document.querySelector("#m-porsi .opt.on")||{dataset:{porsi:"normal"}}).dataset.porsi;
+    const row={id:crypto.randomUUID(),user_id:state.user.id,tanggal:state.tanggal,
+               jam,deskripsi:desc,porsi,perkiraan_kkal:KKAL[porsi],protein_g:null};
+    state.makan.push(row);
+    await simpan("meals",row);
+  }
   document.getElementById("m-desc").value="";
   renderToday(); simpanStatus();
 };
@@ -1655,6 +1713,87 @@ function renderModul(){
   isi.querySelectorAll("[data-info]").forEach(el=>el.onclick=()=>bukaInfo(el.dataset.info));
 }
 
+
+
+// =====================================================================
+// PENCATATAN MAKAN RINCI
+// Mode cepat tetap default. Rinci hanya untuk yang mau — pencatatan
+// yang merepotkan justru membuat orang berhenti mencatat sama sekali.
+// =====================================================================
+let modeRinci = false;
+let draftItem = [];
+const LANGKAH_JUMLAH = { porsi:0.25, mangkuk:0.25, gelas:0.25, sendok:1, tusuk:1,
+                         butir:1, potong:1, buah:1, lembar:1, ekor:1, bungkus:1 };
+
+async function muatBahan(){
+  try{
+    const {data}=await sb.from("foods").select("*").order("kategori").order("id");
+    state.bahan=data||[];
+    await cacheSet("bahan",state.bahan);
+  }catch(e){ state.bahan=await cacheGet("bahan")||[]; }
+}
+function langkahJumlah(sat){ return LANGKAH_JUMLAH[sat] || 1; }
+function totalDraft(){
+  return draftItem.reduce((a,b)=>({kkal:a.kkal+(b.kkal||0), protein:a.protein+(b.protein_g||0)}),
+                          {kkal:0,protein:0});
+}
+function hitungItem(it){
+  const f=(state.bahan||[]).find(x=>x.id===it.food_id);
+  if(f){ it.kkal=Math.round(Number(f.kkal)*it.jumlah);
+         it.protein_g=Math.round(Number(f.protein_g)*it.jumlah*10)/10; }
+  return it;
+}
+function renderDraft(){
+  const box=document.getElementById("m-item");
+  const tot=document.getElementById("m-total");
+  if(!draftItem.length){ box.innerHTML=""; tot.style.display="none"; return; }
+  box.innerHTML=draftItem.map((it,i)=>`
+    <div class="row" style="flex-wrap:wrap;gap:6px">
+      <div style="flex:1;min-width:120px">
+        <div class="t">${it.nama}</div>
+        <div class="faint">≈${it.kkal||0} kkal · ${it.protein_g||0} g protein</div>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center">
+        <button class="small" data-j="${i}" data-d="-1">–</button>
+        <strong style="min-width:62px;text-align:center">${it.jumlah} <span class="faint" style="font-weight:400;font-size:12px">${it.satuan||""}</span></strong>
+        <button class="small" data-j="${i}" data-d="1">+</button>
+        <button class="small" data-hapus="${i}" style="color:var(--bad)">×</button>
+      </div>
+    </div>`).join("");
+  const t2=totalDraft();
+  document.getElementById("tot-kkal").textContent=Math.round(t2.kkal).toLocaleString("id-ID");
+  document.getElementById("tot-protein").textContent=Math.round(t2.protein*10)/10;
+  tot.style.display="";
+  box.querySelectorAll("[data-j]").forEach(b=>b.onclick=()=>{
+    const i=+b.dataset.j, it=draftItem[i], step=langkahJumlah(it.satuan);
+    it.jumlah=Math.round((it.jumlah + (+b.dataset.d)*step)*100)/100;
+    if(it.jumlah<=0){ draftItem.splice(i,1); } else hitungItem(it);
+    renderDraft();
+  });
+  box.querySelectorAll("[data-hapus]").forEach(b=>b.onclick=()=>{
+    draftItem.splice(+b.dataset.hapus,1); renderDraft();
+  });
+}
+function renderCari(){
+  const q=document.getElementById("m-cari").value.trim().toLowerCase();
+  const box=document.getElementById("m-hasil");
+  if(q.length<2){ box.innerHTML=""; return; }
+  const hasil=(state.bahan||[]).filter(f=>L(f.nama).toLowerCase().includes(q)).slice(0,6);
+  if(!hasil.length){ box.innerHTML=`<div class="faint" style="padding:6px 0">${t("tak_ditemukan")}</div>`; return; }
+  box.innerHTML=hasil.map(f=>`<button class="opt" data-f="${f.id}" style="padding:10px 12px">
+      <div style="display:flex;justify-content:space-between;gap:8px">
+        <span>${L(f.nama)}</span>
+        <span class="faint">${f.kkal} kkal / ${f.satuan}</span>
+      </div></button>`).join("");
+  box.querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>{
+    const f=state.bahan.find(x=>x.id===b.dataset.f);
+    const ada=draftItem.find(x=>x.food_id===f.id);
+    if(ada){ ada.jumlah=Math.round((ada.jumlah+langkahJumlah(f.satuan))*100)/100; hitungItem(ada); }
+    else draftItem.push(hitungItem({food_id:f.id, nama:L(f.nama), satuan:f.satuan, jumlah:1}));
+    document.getElementById("m-cari").value=""; box.innerHTML="";
+    renderDraft();
+  });
+}
 
 // =====================================================================
 // GRUP — hanya membaca daily_status (centang), bukan isi catatan apa pun
@@ -2349,6 +2488,7 @@ async function bukaApp(){
   await pastikanProgram();
   await muatProgram();
   await muatPustaka();
+  await muatBahan();
   await muatModul();
   await muatHari();
   state.siap=true;
