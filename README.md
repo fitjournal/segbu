@@ -9,6 +9,9 @@ Single-file HTML + Supabase + GitHub Pages. Offline-first, dwibahasa (ID/EN).
 | File | Fungsi |
 |---|---|
 | `reset.sql` | Hapus semua tabel — untuk mulai bersih dari nol |
+| `seed-modules.sql` | 18 gerakan tambahan + 5 modul fokus |
+| `seed-programs.sql` | Program 12 minggu × 3 level, dimuat aplikasi dari database |
+| `muscle-base.png`, `muscle-index.png` | Peta otot — tubuh abu-abu + peta indeks kelompok otot |
 | `seed-exercises.sql` | 14 gerakan inti — cara melakukan, kesalahan umum, otot |
 | `schema.sql` | Seluruh tabel, RLS, fungsi token, data awal otot & pola gerakan |
 | `index.html` | Aplikasi: masuk/daftar, token grup, onboarding, skrining, antrean offline |
@@ -128,7 +131,31 @@ Setelah `schema.sql`, jalankan juga **`seed-exercises.sql`** (14 gerakan inti).
 
 Semua penulisan lewat antrean offline: tulis lokal dulu, kirim saat online.
 
-## Berikutnya (Tahap 3)
+## Tahap 3A + 3B — sudah jalan
+
+Jalankan **`seed-programs.sql`** setelah `seed-exercises.sql`.
+
+- Program 12 minggu kini dibaca dari database, bukan ditulis di kode.
+  Set & rep naik otomatis per fase (mg 1-2, 3-4, 5-8, 9-12).
+- Popup gerakan menampilkan **peta otot**: oranye = otot utama, oranye muda = pendukung,
+  sisanya abu-abu. Diwarnai saat dijalankan lewat canvas, jadi cukup dua file gambar
+  untuk semua gerakan.
+- Kalau tabel program kosong atau sedang offline tanpa cache, aplikasi memakai
+  program cadangan yang tertanam di kode — tidak pernah kosong.
+
+## Tahap 3C — modul fokus
+
+Jalankan **`seed-modules.sql`** (setelah seed-exercises & seed-programs).
+
+Pustaka gerakan jadi **32**. Lima modul fokus muncul di layar Hari Ini sebagai
+tambahan opsional di akhir sesi: Bokong Kuat, Inti Tubuh & Postur, Lengan & Bahu,
+Paha & Betis, serta Keseimbangan & Mobilitas (muncul hanya untuk usia 55+).
+
+Tiap modul menampilkan kalimat jujur tentang apa yang benar-benar terjadi — misalnya
+bahwa latihan betis membesarkan betis berotot, dan lemak perut tidak hilang oleh
+latihan perut. Ini disengaja: harapan yang tepat membuat orang bertahan lebih lama.
+
+## Berikutnya (Tahap 3D)
 
 Pustaka gerakan & program dipindah dari kode ke database, peta otot, modul fokus,
 serta lapisan grup (status disiplin, sesi bersama).

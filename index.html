@@ -288,6 +288,13 @@
       <button class="btn ghost" id="m-add" data-t="tambah_makan">Tambah catatan makan</button>
     </div>
 
+    <div class="card" id="c-modul">
+      <h2 data-t="modul_fokus">Modul Fokus</h2>
+      <div class="faint" data-t="modul_fokus_ket">Tambahan 10-15 menit di akhir sesi. Opsional.</div>
+      <div id="modul-pilih" class="opts" style="margin-top:10px"></div>
+      <div id="modul-isi"></div>
+    </div>
+
     <div class="card" id="c-habit" style="display:none">
       <h2 data-t="kebiasaan">Kebiasaan</h2>
       <div id="habit-list"></div>
@@ -481,7 +488,9 @@ const T = {
   cara:"Cara melakukan", salah:"Kesalahan umum", kenapa:"Kenapa penting",
   otot_utama:"Otot utama", otot_pendukung:"Pendukung", tutup:"Tutup",
   porsi_kecil:"Kecil", porsi_sedang:"Sedang", porsi_normal:"Normal", porsi_banyak:"Banyak",
-  hapus:"Hapus", tersalin:"Tersalin!", belum_makan:"Belum ada catatan makan hari ini."
+  hapus:"Hapus", tersalin:"Tersalin!", belum_makan:"Belum ada catatan makan hari ini.",
+  modul_fokus:"Modul Fokus", modul_fokus_ket:"Tambahan 10-15 menit di akhir sesi. Opsional.",
+  tanpa_modul:"Tanpa modul hari ini", pilih_modul:"Pilih modul", modul_kosong:"Belum ada modul tersedia."
  },
  en:{ memuat:"Loading…", judul:APP_NAMA, subjudul:"", masuk:"Sign in", daftar:"Register",
   email:"Email", sandi:"Password", kode_grup:"Group code", cek_kode:"Check code",
@@ -523,7 +532,9 @@ const T = {
   cara:"How to do it", salah:"Common mistake", kenapa:"Why it matters",
   otot_utama:"Primary muscles", otot_pendukung:"Supporting", tutup:"Close",
   porsi_kecil:"Small", porsi_sedang:"Medium", porsi_normal:"Normal", porsi_banyak:"Large",
-  hapus:"Delete", tersalin:"Copied!", belum_makan:"No meals logged today."
+  hapus:"Delete", tersalin:"Copied!", belum_makan:"No meals logged today.",
+  modul_fokus:"Focus Module", modul_fokus_ket:"An extra 10-15 minutes at the end. Optional.",
+  tanpa_modul:"No module today", pilih_modul:"Pick a module", modul_kosong:"No modules available yet."
  }
 };
 let lang = localStorage.getItem("lang") || (navigator.language||"id").slice(0,2);
@@ -1211,6 +1222,8 @@ function renderToday(){
   }
   pz.querySelectorAll(".opt").forEach(b=>b.textContent=t("porsi_"+b.dataset.porsi));
 
+  renderModul();
+
   // kebiasaan opsional
   const hOn=localStorage.getItem("habit_on")==="1";
   document.getElementById("c-habit").style.display=hOn?"":"none";
@@ -1302,7 +1315,7 @@ document.getElementById("m-add").onclick=async()=>{
 // popup cara melakukan
 async function bukaInfo(exId){
   const sheet=document.getElementById("sheet");
-  const info=GERAK[exId];
+  const info=GERAK[exId]||{n:{id:exId,en:exId}};
   sheet.innerHTML=`<h3>${L(info.n)}</h3><div class="faint">${lang==="id"?"Memuat…":"Loading…"}</div>`;
   document.getElementById("modal").classList.add("on");
   let ex=null;
@@ -1333,6 +1346,76 @@ async function bukaInfo(exId){
   if(cv.style.display==="none") document.getElementById("peta-ket").style.display="none";
 }
 document.getElementById("modal").onclick=e=>{ if(e.target.id==="modal") e.currentTarget.classList.remove("on"); };
+
+
+// =====================================================================
+// MODUL FOKUS — ditempel di akhir sesi, pilihan per hari
+// =====================================================================
+async function muatModul(){
+  try{
+    const {data:mods}=await sb.from("modules").select("*");
+    const {data:items}=await sb.from("module_items")
+      .select("*, exercises(id,nama,alat_dibutuhkan,otot_primer,otot_sekunder)");
+    const byMod={};
+    (items||[]).sort((a,b)=>a.urutan-b.urutan).forEach(i=>{(byMod[i.module_id]=byMod[i.module_id]||[]).push(i);});
+    state.modul={mods:mods||[],byMod};
+    await cacheSet("modul",state.modul);
+  }catch(e){ state.modul=await cacheGet("modul")||{mods:[],byMod:{}}; }
+}
+function usiaPengguna(){
+  const d=state.profil.tanggal_lahir;
+  return d?Math.floor((Date.now()-new Date(d))/31557600000):null;
+}
+function modulTersedia(){
+  const u=usiaPengguna(), g=state.profil.gender;
+  return (state.modul&&state.modul.mods||[]).filter(m=>{
+    if(m.usia_min && (u===null || u<m.usia_min)) return false;
+    if(m.gender_disarankan && m.gender_disarankan!=="semua" && m.gender_disarankan!==g) return false;
+    return true;
+  });
+}
+const modulKunci = ()=>"modul:"+state.tanggal;
+function renderModul(){
+  const box=document.getElementById("modul-pilih"), isi=document.getElementById("modul-isi");
+  const tersedia=modulTersedia();
+  if(!tersedia.length){ box.innerHTML=`<div class="faint">${t("modul_kosong")}</div>`; isi.innerHTML=""; return; }
+  const aktif=localStorage.getItem(modulKunci())||"";
+  box.innerHTML=`<button class="opt ${aktif?"":"on"}" data-m="">${t("tanpa_modul")}</button>`+
+    tersedia.map(m=>`<button class="opt ${aktif===m.id?"on":""}" data-m="${m.id}">${L(m.nama)}</button>`).join("");
+  box.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
+    const id=b.dataset.m;
+    if(id) localStorage.setItem(modulKunci(),id); else localStorage.removeItem(modulKunci());
+    renderModul();
+  });
+  if(!aktif){ isi.innerHTML=""; return; }
+  const m=tersedia.find(x=>x.id===aktif);
+  const items=(state.modul.byMod[aktif]||[]);
+  isi.innerHTML=`<div class="faint" style="margin:12px 0 4px;padding:10px 12px;background:var(--accent-dim);
+      border-radius:8px;color:var(--text)">${L(m.deskripsi_jujur)}</div>`;
+  items.forEach(it=>{
+    const ex=it.exercises||{}, id=it.exercise_id;
+    const d=document.createElement("div"); d.className="ex";
+    let dots="";
+    for(let i=1;i<=it.set_count;i++){const s=setKey(id,i);
+      dots+=`<div class="dot ${s&&s.selesai?"on":""}" data-ex="${id}" data-set="${i}">${s&&s.selesai?"✓":i}</div>`;}
+    d.innerHTML=`<div class="exh"><div class="exn">${L(ex.nama)||id}</div>
+        <div class="ext">${it.set_count}×${it.rep_text}</div></div>
+      <div class="exr"><span class="ext">${t("tanpa_beban")}</span><div class="dots">${dots}</div></div>
+      <button class="info" data-info="${id}">${lang==="id"?"Lihat cara melakukan →":"See how to do it →"}</button>`;
+    isi.appendChild(d);
+  });
+  isi.querySelectorAll(".dot").forEach(el=>el.onclick=async()=>{
+    const ex=el.dataset.ex, i=+el.dataset.set;
+    const sesi=await pastikanSesi(lang==="id"?"Modul":"Module");
+    let s=setKey(ex,i);
+    if(!s){ s={id:crypto.randomUUID(),session_id:sesi.id,user_id:state.user.id,
+               exercise_id:ex,set_ke:i,beban_kg:null,selesai:true}; state.sets.push(s); }
+    else s.selesai=!s.selesai;
+    await simpan("session_sets",s);
+    renderModul();
+  });
+  isi.querySelectorAll("[data-info]").forEach(el=>el.onclick=()=>bukaInfo(el.dataset.info));
+}
 
 // =====================================================================
 // PROGRES
@@ -1535,6 +1618,7 @@ document.querySelectorAll(".tab").forEach(tb=>tb.onclick=()=>{
 async function bukaApp(){
   await pastikanProgram();
   await muatProgram();
+  await muatModul();
   await muatHari();
   state.siap=true;
   document.getElementById("tabs").style.display="";
