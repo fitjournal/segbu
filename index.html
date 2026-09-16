@@ -154,9 +154,11 @@
 
   /* popup */
   .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:60;display:none;
+         overscroll-behavior:contain;
          align-items:flex-end;justify-content:center}
   .modal.on{display:flex}
   .sheet{background:var(--panel);width:100%;max-width:520px;max-height:86vh;overflow-y:auto;
+         overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
          border-radius:16px 16px 0 0;padding:20px 18px calc(24px + env(safe-area-inset-bottom))}
   .sheet h3{font-family:var(--fd);font-size:21px;margin:0 0 4px}
   .sheet ol{padding-left:20px;font-size:14px;line-height:1.7}
@@ -842,6 +844,31 @@ const senin = d => addH(d, d.getDay()===0?-6:1-d.getDay());
 function targetLangkah(mg){ return mg<=1?2500:mg<=2?3000:mg<=4?3500:mg<=8?4500:5000; }
 
 
+
+// =====================================================================
+// POPUP — mengunci scroll halaman di belakangnya
+// Di iOS, overflow:hidden saja tidak cukup; posisi body harus dikunci.
+// =====================================================================
+let _scrollY = 0;
+function bukaModal(){
+  _scrollY = window.scrollY || document.documentElement.scrollTop || 0;
+  document.body.style.position = "fixed";
+  document.body.style.top = `-${_scrollY}px`;
+  document.body.style.left = "0";
+  document.body.style.right = "0";
+  document.body.style.width = "100%";
+  document.getElementById("modal").classList.add("on");
+}
+function tutupModal(){
+  document.getElementById("modal").classList.remove("on");
+  document.body.style.position = "";
+  document.body.style.top = "";
+  document.body.style.left = "";
+  document.body.style.right = "";
+  document.body.style.width = "";
+  window.scrollTo(0, _scrollY);
+}
+
 // =====================================================================
 // PETA OTOT — satu gambar indeks diwarnai ulang lewat canvas
 // muscle-index.png: nilai piksel = nomor kelompok otot
@@ -1461,12 +1488,13 @@ async function bukaInfo(exId){
   const sheet=document.getElementById("sheet");
   const info=GERAK[exId]||{n:{id:exId,en:exId}};
   sheet.innerHTML=`<h3>${L(info.n)}</h3><div class="faint">${lang==="id"?"Memuat…":"Loading…"}</div>`;
-  document.getElementById("modal").classList.add("on");
+  bukaModal();
   let ex=null;
   try{ const {data}=await sb.from("exercises").select("*").eq("id",exId).maybeSingle(); ex=data; }catch(e){}
   if(!ex){ sheet.innerHTML=`<h3>${L(info.n)}</h3>
     <p class="faint">${lang==="id"?"Detail gerakan belum tersedia offline.":"Exercise detail not available offline."}</p>
-    <button class="btn ghost" onclick="document.getElementById('modal').classList.remove('on')">${t("tutup")}</button>`; return; }
+    <button class="btn ghost" id="tutup-sheet2">${t("tutup")}</button>`;
+    document.getElementById("tutup-sheet2").onclick=tutupModal; return; }
   const langkah=(ex.cara_melakukan&&(ex.cara_melakukan[lang]||ex.cara_melakukan.id))||[];
   const map=await petaOtot();
   const namaOtot=a=>(a||[]).map(x=>map[x]?L(map[x].n):x).join(", ");
@@ -1493,12 +1521,20 @@ async function bukaInfo(exId){
     ${(ex.otot_sekunder||[]).length?`<h2 style="margin-top:12px">${t("otot_pendukung")}</h2>
       <p style="font-size:14px;color:var(--dim)">${namaOtot(ex.otot_sekunder)}</p>`:""}
     <button class="btn ghost" id="tutup-sheet">${t("tutup")}</button>`;
-  document.getElementById("tutup-sheet").onclick=()=>document.getElementById("modal").classList.remove("on");
+  document.getElementById("tutup-sheet").onclick=tutupModal;
   const cv=document.getElementById("peta-otot");
   await gambarPeta(cv, ex.otot_primer, ex.otot_sekunder);
   if(cv.style.display==="none") document.getElementById("peta-ket").style.display="none";
 }
-document.getElementById("modal").onclick=e=>{ if(e.target.id==="modal") e.currentTarget.classList.remove("on"); };
+document.getElementById("modal").onclick=e=>{ if(e.target.id==="modal") tutupModal(); };
+// Cegah gulir latar saat jari menggeser di luar area isi popup
+document.getElementById("modal").addEventListener("touchmove", e=>{
+  if(!document.getElementById("sheet").contains(e.target)) e.preventDefault();
+}, {passive:false});
+// Esc menutup popup
+addEventListener("keydown", e=>{
+  if(e.key==="Escape" && document.getElementById("modal").classList.contains("on")) tutupModal();
+});
 
 
 
@@ -2284,8 +2320,8 @@ function bukaKebijakan(){
   const sheet=document.getElementById("sheet");
   sheet.innerHTML = (KEBIJAKAN[lang]||KEBIJAKAN.id) +
     `<button class="btn ghost" id="tutup-keb">${t("tutup")}</button>`;
-  document.getElementById("modal").classList.add("on");
-  document.getElementById("tutup-keb").onclick=()=>document.getElementById("modal").classList.remove("on");
+  bukaModal();
+  document.getElementById("tutup-keb").onclick=tutupModal;
 }
 
 // =====================================================================
