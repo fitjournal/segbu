@@ -685,7 +685,11 @@ document.getElementById("onb-next").onclick = async ()=>{
   pesan("onb-msg","");
 
   if (state.step < LANGKAH.length-1){ state.step++; renderOnb(); return; }
-  await selesaikanOnboarding();
+  const btn = document.getElementById("onb-next");
+  btn.disabled = true;
+  try { await selesaikanOnboarding(); }
+  catch(e){ /* pesan sudah ditampilkan */ }
+  finally { btn.disabled = false; }
 };
 
 function hitungLevel(){
@@ -710,13 +714,18 @@ async function selesaikanOnboarding(){
   const jawabanSkrining = {};
   SKRINING.forEach(q=>{ if(j["s_"+q.k]!==undefined) jawabanSkrining[q.k]=j["s_"+q.k]; });
 
-  await sb.from("health_screening").insert({
+  const { error: errSkrining } = await sb.from("health_screening").insert({
     user_id: state.user.id,
     jawaban: jawabanSkrining,
     ada_flag_merah: merah,
     disetujui_pengguna: true,
     versi_disclaimer: "v1-2026-09"
   });
+  if (errSkrining){
+    pesan("onb-msg", (lang==="id"
+      ? "Gagal menyimpan skrining: " : "Failed to save screening: ") + errSkrining.message);
+    throw errSkrining;
+  }
 
   const patch = {
     gender: j.gender, tanggal_lahir: j.tanggal_lahir, tinggi_cm: j.tinggi_cm,
@@ -724,7 +733,13 @@ async function selesaikanOnboarding(){
     waktu_latihan: j.waktu, tujuan_utama: j.tujuan, bahasa: lang,
     onboarding_selesai: true, updated_at: new Date().toISOString()
   };
-  await sb.from("profiles").update(patch).eq("id", state.user.id);
+  const { error: errProfil } = await sb.from("profiles")
+    .upsert(Object.assign({ id: state.user.id }, patch));
+  if (errProfil){
+    pesan("onb-msg", (lang==="id"
+      ? "Gagal menyimpan profil: " : "Failed to save profile: ") + errProfil.message);
+    throw errProfil;
+  }
   state.profil = Object.assign(state.profil||{}, patch);
 
   if (merah){
@@ -787,7 +802,13 @@ async function mulai(){
   if (!session){ show("v-auth"); return; }
   state.user = session.user;
 
-  const { data: prof } = await sb.from("profiles").select("*").eq("id", state.user.id).single();
+  let { data: prof } = await sb.from("profiles").select("*").eq("id", state.user.id).maybeSingle();
+  if (!prof){
+    // Baris profil belum ada (mis. akun dibuat sebelum trigger aktif) — buat sekarang.
+    const baru = { id: state.user.id, nama: (state.user.user_metadata||{}).nama || "" };
+    const { data: dibuat } = await sb.from("profiles").upsert(baru).select().maybeSingle();
+    prof = dibuat || baru;
+  }
   state.profil = prof || {};
   if (prof && prof.bahasa && T[prof.bahasa]){ lang = prof.bahasa; localStorage.setItem("lang",lang); applyLang(); }
   await cacheSet("profil", state.profil);
