@@ -578,7 +578,7 @@ const T = {
   periode:"Periode", buat_grup:"Buat grup", perpanjang:"+12 bulan", tutup_grup:"Tutup",
   privasi_data:"Data & Privasi Anda", baca_kebijakan:"Baca kebijakan data",
   kursi_terpakai:"%a dari %b kursi", tanpa_batas:"Tanpa batas", belum_mulai:"Belum dimulai",
-  riwayat_makan:"Riwayat Makan", riwayat_habit:"Riwayat Kebiasaan", pola:"Pola yang Terlihat",
+  sudah_punya:"✓ Dimiliki", riwayat_makan:"Riwayat Makan", riwayat_habit:"Riwayat Kebiasaan", pola:"Pola yang Terlihat",
   pola_ket:"Ini hanya pola yang terlihat dari catatan Anda, bukan sebab-akibat. Banyak hal lain ikut berpengaruh, dan data beberapa hari belum cukup untuk menyimpulkan apa pun.",
   belum_cukup:"Belum cukup data untuk dilihat polanya. Terus catat beberapa hari lagi.",
   malam_pakai:"Malam dengan %s", malam_tanpa:"Malam tanpa %s",
@@ -642,7 +642,7 @@ const T = {
   periode:"Period", buat_grup:"Create group", perpanjang:"+12 months", tutup_grup:"Close",
   privasi_data:"Your Data & Privacy", baca_kebijakan:"Read data policy",
   kursi_terpakai:"%a of %b seats", tanpa_batas:"Unlimited", belum_mulai:"Not started",
-  riwayat_makan:"Meal History", riwayat_habit:"Habit History", pola:"Patterns Observed",
+  sudah_punya:"✓ Owned", riwayat_makan:"Meal History", riwayat_habit:"Habit History", pola:"Patterns Observed",
   pola_ket:"These are patterns visible in your own log, not cause and effect. Many other factors play a part, and a few days of data cannot settle anything.",
   belum_cukup:"Not enough data to see a pattern yet. Keep logging for a few more days.",
   malam_pakai:"Nights with %s", malam_tanpa:"Nights without %s",
@@ -2094,12 +2094,18 @@ function renderAlat(){
   box.className="opts";
   box.innerHTML=DAFTAR_ALAT.map(a=>{
     const on=punya.includes(a.v);
-    return `<button class="opt ${on?"on":""}" data-a="${a.v}" style="line-height:1.5">
-      <div style="display:flex;justify-content:space-between;gap:8px">
-        <strong>${a[lang]||a.id}</strong><span style="color:var(--faint)">${on?"✓":"+"}</span>
+    // Hijau = sudah dimiliki (aman). Netral = belum, dengan info belanja.
+    const gaya = on
+      ? 'border-color:var(--good);background:var(--good-dim)'
+      : '';
+    return `<button class="opt" data-a="${a.v}" style="line-height:1.5;${gaya}">
+      <div style="display:flex;justify-content:space-between;gap:8px;align-items:center">
+        <strong>${a[lang]||a.id}</strong>
+        <span style="font-size:12px;font-weight:600;color:${on?"var(--good)":"var(--faint)"}">
+          ${on?t("sudah_punya"):"+"}</span>
       </div>
       <div class="faint" style="margin-top:4px">${L(a.spek)}</div>
-      <div class="faint" style="margin-top:3px;color:var(--accent)">${L(a.beli)}</div>
+      ${on?"":`<div class="faint" style="margin-top:3px;color:var(--accent)">${L(a.beli)}</div>`}
     </button>`;}).join("");
   box.querySelectorAll(".opt").forEach(b=>b.onclick=async()=>{
     const v=b.dataset.a, arr=alatSaya(), i=arr.indexOf(v);
