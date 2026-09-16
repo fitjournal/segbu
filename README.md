@@ -9,6 +9,7 @@ Single-file HTML + Supabase + GitHub Pages. Offline-first, dwibahasa (ID/EN).
 | File | Fungsi |
 |---|---|
 | `reset.sql` | Hapus semua tabel — untuk mulai bersih dari nol |
+| `seed-exercises.sql` | 14 gerakan inti — cara melakukan, kesalahan umum, otot |
 | `schema.sql` | Seluruh tabel, RLS, fungsi token, data awal otot & pola gerakan |
 | `index.html` | Aplikasi: masuk/daftar, token grup, onboarding, skrining, antrean offline |
 | `sw.js` | Service worker — kerangka & aset tersimpan supaya bisa dibuka offline |
@@ -113,7 +114,21 @@ Tanpa ini, tautan konfirmasi email dan reset kata sandi akan mengarah ke
 - Teman satu grup hanya bisa membaca tabel `daily_status` (centang selesai/tidak),
   bukan `meals`, `daily_logs`, atau `habit_logs`
 
-## Berikutnya (Tahap 2)
+## Tahap 2 — sudah jalan
 
-Pindahkan fitur aplikasi 12 minggu yang sudah ada ke fondasi ini: pencatatan latihan,
-langkah, tidur, berat badan, makan — semuanya lewat antrean offline.
+Setelah `schema.sql`, jalankan juga **`seed-exercises.sql`** (14 gerakan inti).
+
+- **Hari Ini** — jadwal otomatis dari tanggal mulai + hari/minggu Anda (Latihan A/B, ringan, cardio, istirahat)
+- Centang per set, beban per gerakan, popup cara melakukan + kesalahan umum
+- Langkah, jam tidur & bangun (durasi otomatis), terbangun tengah malam
+- Catatan makan dengan porsi Kecil/Sedang/Normal/Banyak
+- Pelacak kebiasaan **opsional**, mati secara default
+- **Progres** — berat & lingkar tubuh, tren berat, statistik mingguan, riwayat, salin ringkasan
+- **Atur** — tanggal mulai program, izin privasi, modul, tema, status sinkron
+
+Semua penulisan lewat antrean offline: tulis lokal dulu, kirim saat online.
+
+## Berikutnya (Tahap 3)
+
+Pustaka gerakan & program dipindah dari kode ke database, peta otot, modul fokus,
+serta lapisan grup (status disiplin, sesi bersama).

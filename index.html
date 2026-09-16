@@ -29,32 +29,40 @@
       --accent-dim:#fae3d5;--good-dim:#d9f0dd;--bad-dim:#f9d9d6;
     }
   }
+  :root[data-theme="light"]{
+    --bg:#f4f3f0;--panel:#fff;--raised:#f7f6f3;--line:#e3e1db;
+    --text:#191a1c;--dim:#5b5e63;--faint:#8a8d92;
+    --accent-dim:#fae3d5;--good-dim:#d9f0dd;--bad-dim:#f9d9d6;
+  }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0;background:var(--bg);color:var(--text)}
-  body{font-family:var(--fb);-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums;
-       min-height:100vh;padding-bottom:env(safe-area-inset-bottom)}
-  .wrap{max-width:520px;margin:0 auto;padding:max(20px,env(safe-area-inset-top)) 18px 28px}
+  body{font-family:var(--fb);-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums;min-height:100vh}
+  .wrap{max-width:520px;margin:0 auto;padding:max(18px,env(safe-area-inset-top)) 16px 96px}
+  .wrap.noTab{padding-bottom:28px}
 
-  h1{font-family:var(--fd);font-size:30px;margin:0 0 4px;line-height:1.15}
-  h2{font-family:var(--fd);font-size:17px;margin:0 0 10px;font-weight:600}
+  h1{font-family:var(--fd);font-size:29px;margin:0 0 3px;line-height:1.15}
+  h2{font-family:var(--fd);font-size:16px;margin:0 0 10px;font-weight:600;color:var(--dim);letter-spacing:.3px}
   p{margin:8px 0;line-height:1.6}
-  .sub{color:var(--dim);font-size:14px;margin-bottom:22px}
+  .sub{color:var(--dim);font-size:14px;margin-bottom:20px}
   .faint{color:var(--faint);font-size:12.5px;line-height:1.55}
 
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px;margin-bottom:14px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:13px}
   label{display:block;font-size:13px;color:var(--dim);margin:14px 0 6px}
-  input[type=text],input[type=email],input[type=password],input[type=number],input[type=date],select{
-    width:100%;padding:12px;border-radius:7px;border:1px solid var(--line);
+  input[type=text],input[type=email],input[type=password],input[type=number],input[type=date],input[type=time],select{
+    width:100%;padding:11px;border-radius:7px;border:1px solid var(--line);
     background:var(--bg);color:var(--text);font-family:var(--fb);font-size:16px}
   input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
+  input.mini{width:92px;padding:9px;text-align:right;font-size:15px}
 
   button{font-family:var(--fb);cursor:pointer}
   .btn{width:100%;padding:14px;border-radius:8px;border:none;background:var(--accent);
-       color:#fff;font-family:var(--fd);font-size:16px;font-weight:600;letter-spacing:.3px;margin-top:16px}
-  .btn:disabled{opacity:.5;cursor:not-allowed}
+       color:#fff;font-family:var(--fd);font-size:16px;font-weight:600;letter-spacing:.3px;margin-top:14px}
+  .btn:disabled{opacity:.5}
   .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--dim);font-family:var(--fb);font-size:14px}
-  .btn.danger{background:var(--bad)}
-  .link{background:none;border:none;color:var(--accent);font-size:14px;padding:10px;width:100%;margin-top:6px}
+  .btn.done{background:var(--good)}
+  .link{background:none;border:none;color:var(--accent);font-size:14px;padding:10px;width:100%;margin-top:4px}
+  .small{padding:7px 12px;border-radius:6px;border:1px solid var(--line);background:var(--raised);color:var(--text);font-size:13px}
+  .small.on{background:var(--accent);border-color:var(--accent);color:#fff}
 
   .opts{display:flex;flex-direction:column;gap:8px;margin-top:6px}
   .opt{padding:13px 14px;border:1.5px solid var(--line);border-radius:8px;background:var(--panel);
@@ -71,10 +79,10 @@
   .q:first-child{border-top:none;padding-top:0}
   .q p{margin:0 0 10px;font-size:14.5px}
 
-  .bar{height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin-bottom:22px}
+  .bar{height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin-bottom:20px}
   .bar i{display:block;height:100%;background:var(--accent);transition:width .3s}
 
-  .msg{padding:12px 14px;border-radius:8px;font-size:13.5px;margin-top:14px;line-height:1.55}
+  .msg{padding:12px 14px;border-radius:8px;font-size:13.5px;margin-top:12px;line-height:1.55}
   .msg.err{background:var(--bad-dim);color:var(--bad)}
   .msg.ok{background:var(--good-dim);color:var(--good)}
   .msg.warn{background:var(--accent-dim);color:var(--accent)}
@@ -82,6 +90,7 @@
   .view{display:none}.view.on{display:block}
   .row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 0;border-top:1px solid var(--line)}
   .row:first-child{border-top:none}
+  .row .t{font-size:14.5px}
   .sw{position:relative;width:46px;height:26px;flex-shrink:0}
   .sw input{opacity:0;width:0;height:0}
   .sw span{position:absolute;inset:0;background:var(--line);border-radius:26px;transition:.2s}
@@ -89,75 +98,121 @@
   .sw input:checked+span{background:var(--accent)}
   .sw input:checked+span:before{transform:translateX(20px)}
 
-  #sync{position:fixed;left:50%;transform:translateX(-50%);bottom:14px;z-index:50;
-        padding:7px 14px;border-radius:100px;font-size:12px;font-weight:600;
-        background:var(--raised);border:1px solid var(--line);color:var(--dim);
-        opacity:0;transition:opacity .3s;pointer-events:none}
+  /* hero hari ini */
+  .hero{background:linear-gradient(160deg,var(--raised),var(--panel));border:1px solid var(--line);
+        border-radius:12px;padding:16px 18px;margin-bottom:14px}
+  .hero .d{color:var(--dim);font-size:13px}
+  .hero .n{font-family:var(--fd);font-size:27px;line-height:1.1;margin-top:1px}
+  .chips{display:flex;gap:7px;margin-top:9px;flex-wrap:wrap}
+  .chip{padding:3px 10px;border-radius:100px;font-size:12px;font-weight:600;background:var(--accent-dim);color:var(--accent)}
+  .chip.g{background:var(--good-dim);color:var(--good)}
+  .chip.n{background:transparent;color:var(--dim);border:1px solid var(--line)}
+
+  /* daftar tugas */
+  .task{display:flex;align-items:center;gap:12px;padding:13px 0;border-top:1px solid var(--line)}
+  .task:first-child{border-top:none}
+  .tick{width:27px;height:27px;border-radius:50%;border:2px solid var(--line);background:var(--bg);
+        flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;color:transparent}
+  .tick.on{background:var(--good);border-color:var(--good);color:#0e2010}
+  .tick.part{border-color:var(--accent);color:var(--accent);font-size:11px;font-weight:700}
+  .task .lbl{flex:1;font-size:15px}
+  .task .sub2{color:var(--faint);font-size:12px;margin-top:2px}
+
+  /* latihan */
+  .ex{padding:14px 0;border-top:1px solid var(--line)}
+  .ex:first-child{border-top:none}
+  .exh{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+  .exn{font-weight:600;font-size:15px}
+  .ext{color:var(--faint);font-size:12.5px;white-space:nowrap}
+  .exr{display:flex;align-items:center;gap:9px;margin-top:9px;flex-wrap:wrap}
+  .dots{display:flex;gap:6px;margin-left:auto}
+  .dot{width:31px;height:31px;border-radius:50%;border:1.5px solid var(--line);background:var(--bg);
+       color:var(--dim);font-size:12.5px;font-weight:600;display:flex;align-items:center;justify-content:center;
+       -webkit-tap-highlight-color:transparent;user-select:none}
+  .dot.on{background:var(--good);border-color:var(--good);color:#0e2010}
+  .info{background:none;border:none;color:var(--accent);font-size:12.5px;padding:0;margin-top:6px}
+
+  /* statistik */
+  .stats{display:flex;gap:9px;margin-top:12px}
+  .stat{flex:1;background:var(--raised);border-radius:8px;padding:12px;text-align:center}
+  .stat .n{font-family:var(--fd);font-size:23px}
+  .stat .l{font-size:11.5px;color:var(--faint);margin-top:2px}
+
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{text-align:left;padding:7px 4px;border-bottom:1px solid var(--line)}
+  th{color:var(--faint);font-weight:500;font-size:11.5px}
+  td.num{text-align:right}
+  svg.trend{width:100%;height:92px;display:block;margin-top:4px}
+
+  /* tab bawah */
+  .tabs{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--panel);
+        border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom));z-index:20}
+  .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px;
+       background:none;border:none;color:var(--faint);font-size:10.5px}
+  .tab .ic{font-size:18px}
+  .tab.on{color:var(--accent)}
+
+  /* popup */
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:60;display:none;
+         align-items:flex-end;justify-content:center}
+  .modal.on{display:flex}
+  .sheet{background:var(--panel);width:100%;max-width:520px;max-height:86vh;overflow-y:auto;
+         border-radius:16px 16px 0 0;padding:20px 18px calc(24px + env(safe-area-inset-bottom))}
+  .sheet h3{font-family:var(--fd);font-size:21px;margin:0 0 4px}
+  .sheet ol{padding-left:20px;font-size:14px;line-height:1.7}
+
+  #sync{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(74px + env(safe-area-inset-bottom));
+        z-index:50;padding:7px 14px;border-radius:100px;font-size:12px;font-weight:600;
+        background:var(--raised);border:1px solid var(--line);color:var(--dim);opacity:0;transition:opacity .3s;pointer-events:none}
   #sync.show{opacity:1}
   #sync.offline{background:var(--bad-dim);color:var(--bad);border-color:transparent}
-  #sync.ok{background:var(--good-dim);color:var(--good);border-color:transparent}
 
-  .lang{position:absolute;top:18px;right:18px;display:flex;gap:4px}
-  .lang button{padding:5px 9px;font-size:12px;border-radius:5px;border:1px solid var(--line);
-               background:transparent;color:var(--dim)}
+  .lang{position:absolute;top:16px;right:16px;display:flex;gap:4px;z-index:5}
+  .lang button{padding:5px 9px;font-size:12px;border-radius:5px;border:1px solid var(--line);background:transparent;color:var(--dim)}
   .lang button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+  textarea{width:100%;min-height:150px;background:var(--bg);color:var(--text);border:1px solid var(--line);
+           border-radius:7px;padding:10px;font-size:12px;font-family:var(--fb);margin-top:10px}
 </style>
 </head>
 <body>
-<div class="lang">
+<div class="lang" id="langbox">
   <button data-lang="id">ID</button><button data-lang="en">EN</button>
 </div>
 
-<div class="wrap">
+<div class="wrap noTab" id="wrap">
 
-  <!-- MEMUAT -->
   <div class="view on" id="v-load">
     <div style="text-align:center;padding:80px 0;color:var(--faint)" data-t="memuat">Memuat…</div>
   </div>
 
-  <!-- KONFIG BELUM DIISI -->
   <div class="view" id="v-config">
     <h1>Konfigurasi</h1>
-    <div class="card">
-      <p>Isi <code>SUPABASE_URL</code> dan <code>SUPABASE_ANON_KEY</code> di bagian atas blok
-         <code>&lt;script&gt;</code> pada file <code>index.html</code>.</p>
-      <p class="faint">Nilainya ada di dasbor Supabase → Project Settings → API.
-         Gunakan <strong>anon public key</strong>, jangan pernah service_role key.</p>
-    </div>
+    <div class="card"><p>Isi <code>SUPABASE_URL</code> dan <code>SUPABASE_ANON_KEY</code> di dalam <code>index.html</code>.</p></div>
   </div>
 
   <!-- MASUK / DAFTAR -->
   <div class="view" id="v-auth">
-    <h1 data-t="judul">Program Latihan</h1>
-    <div class="sub" data-t="subjudul">Latihan di rumah, terukur, bertahap.</div>
-
+    <h1 data-t="judul">SegBu</h1>
+    <div class="sub" data-t="subjudul"></div>
     <div class="card">
       <div class="opts row" style="margin-bottom:4px">
         <button class="opt on" id="tab-login" data-t="masuk">Masuk</button>
         <button class="opt" id="tab-daftar" data-t="daftar">Daftar</button>
       </div>
-
       <div id="form-login">
-        <label data-t="email">Email</label>
-        <input type="email" id="l-email" autocomplete="email">
-        <label data-t="sandi">Kata sandi</label>
-        <input type="password" id="l-pass" autocomplete="current-password">
+        <label data-t="email">Email</label><input type="email" id="l-email" autocomplete="email">
+        <label data-t="sandi">Kata sandi</label><input type="password" id="l-pass" autocomplete="current-password">
         <button class="btn" id="btn-login" data-t="masuk">Masuk</button>
       </div>
-
       <div id="form-daftar" style="display:none">
         <label data-t="kode_grup">Kode grup</label>
-        <input type="text" id="d-kode" autocapitalize="characters" placeholder="ARCELIO-01">
+        <input type="text" id="d-kode" autocapitalize="characters" placeholder="SEGERBUGAR-01">
         <button class="btn ghost" id="btn-cek" data-t="cek_kode">Periksa kode</button>
         <div id="kode-info"></div>
-
         <div id="daftar-lanjut" style="display:none">
-          <label data-t="nama">Nama</label>
-          <input type="text" id="d-nama" autocomplete="name">
-          <label data-t="email">Email</label>
-          <input type="email" id="d-email" autocomplete="email">
-          <label data-t="sandi">Kata sandi</label>
-          <input type="password" id="d-pass" autocomplete="new-password">
+          <label data-t="nama">Nama</label><input type="text" id="d-nama" autocomplete="name">
+          <label data-t="email">Email</label><input type="email" id="d-email" autocomplete="email">
+          <label data-t="sandi">Kata sandi</label><input type="password" id="d-pass" autocomplete="new-password">
           <div class="faint" style="margin-top:6px" data-t="sandi_min">Minimal 8 karakter.</div>
           <button class="btn" id="btn-daftar" data-t="buat_akun">Buat akun</button>
         </div>
@@ -175,107 +230,304 @@
     <button class="link" id="onb-back" data-t="kembali">Kembali</button>
   </div>
 
-  <!-- BERANDA -->
-  <div class="view" id="v-home">
-    <h1 id="home-hi">Halo</h1>
-    <div class="sub" id="home-sub"></div>
+  <!-- HARI INI -->
+  <div class="view" id="v-today">
+    <div class="hero">
+      <div class="d" id="t-week">—</div>
+      <div class="n" id="t-day">—</div>
+      <div class="chips" id="t-chips"></div>
+    </div>
+
+    <div class="card" id="c-workout" style="display:none">
+      <h2 id="w-title">Latihan</h2>
+      <div id="w-list"></div>
+      <button class="btn" id="w-done">Tandai Latihan Selesai</button>
+    </div>
+
+    <div class="card" id="c-light" style="display:none">
+      <h2 data-t="aktivitas">Aktivitas Hari Ini</h2>
+      <div class="task">
+        <div class="tick" id="light-tick">✓</div>
+        <div class="lbl" id="light-lbl"></div>
+      </div>
+    </div>
 
     <div class="card">
-      <h2 data-t="status_akun">Status Akun</h2>
-      <div class="row"><span data-t="level">Level</span><strong id="h-level">—</strong></div>
-      <div class="row"><span data-t="grup">Grup</span><strong id="h-grup">—</strong></div>
-      <div class="row"><span data-t="berlaku">Berlaku sampai</span><strong id="h-berlaku">—</strong></div>
+      <h2 data-t="catatan_harian">Catatan Harian</h2>
+      <div class="row">
+        <div><div class="t" data-t="langkah">Langkah</div><div class="faint" id="langkah-sub"></div></div>
+        <input type="number" class="mini" id="i-langkah" inputmode="numeric" placeholder="0">
+      </div>
+      <div class="row">
+        <div class="t" data-t="jam_tidur">Jam tidur</div>
+        <input type="time" class="mini" id="i-tidur" style="width:118px">
+      </div>
+      <div class="row">
+        <div class="t" data-t="jam_bangun">Jam bangun</div>
+        <input type="time" class="mini" id="i-bangun" style="width:118px">
+      </div>
+      <div class="row">
+        <div class="t" data-t="durasi_tidur">Durasi tidur</div>
+        <span class="chip n" id="tidur-durasi">—</span>
+      </div>
+      <div class="row">
+        <div><div class="t" data-t="terbangun">Terbangun tengah malam</div>
+             <div class="faint" data-t="terbangun_ket">Dan sulit tidur lagi.</div></div>
+        <label class="sw"><input type="checkbox" id="i-bangunmalam"><span></span></label>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 data-t="makan">Makan</h2>
+      <div id="meal-list"></div>
+      <div class="row" style="border-top:1px solid var(--line);align-items:flex-start;flex-wrap:wrap">
+        <input type="time" id="m-jam" style="width:110px">
+        <input type="text" id="m-desc" placeholder="nasi + ayam + sayur" style="flex:1;min-width:150px">
+      </div>
+      <div class="opts row" id="m-porsi" style="margin-top:8px"></div>
+      <button class="btn ghost" id="m-add" data-t="tambah_makan">Tambah catatan makan</button>
+    </div>
+
+    <div class="card" id="c-habit" style="display:none">
+      <h2 data-t="kebiasaan">Kebiasaan</h2>
+      <div id="habit-list"></div>
+    </div>
+  </div>
+
+  <!-- PROGRES -->
+  <div class="view" id="v-prog">
+    <h1 data-t="progres">Progres</h1>
+    <div class="sub" data-t="progres_sub"></div>
+
+    <div class="card">
+      <h2 data-t="ukuran">Berat & Ukuran</h2>
+      <div class="row"><div class="t" data-t="berat">Berat badan (kg)</div>
+        <input type="number" step="0.1" class="mini" id="i-berat" inputmode="decimal"></div>
+      <div class="row"><div class="t" data-t="perut">Lingkar perut (cm)</div>
+        <input type="number" step="0.5" class="mini" id="i-perut" inputmode="decimal"></div>
+      <div id="ukuran-lain" style="display:none">
+        <div class="row"><div class="t" data-t="pinggang">Lingkar pinggang (cm)</div>
+          <input type="number" step="0.5" class="mini" id="i-pinggang" inputmode="decimal"></div>
+        <div class="row"><div class="t" data-t="pinggul">Lingkar pinggul (cm)</div>
+          <input type="number" step="0.5" class="mini" id="i-pinggul" inputmode="decimal"></div>
+        <div class="row"><div class="t" data-t="lengan">Lingkar lengan (cm)</div>
+          <input type="number" step="0.5" class="mini" id="i-lengan" inputmode="decimal"></div>
+        <div class="row"><div class="t" data-t="paha">Lingkar paha (cm)</div>
+          <input type="number" step="0.5" class="mini" id="i-paha" inputmode="decimal"></div>
+      </div>
+      <button class="link" id="toggle-ukuran" data-t="ukuran_lain">Ukuran lainnya</button>
+      <div class="faint" data-t="ukuran_ket">Cukup 2 minggu sekali, pagi sebelum makan. Mengukur tiap hari hanya menghasilkan naik-turun acak.</div>
+    </div>
+
+    <div class="card">
+      <h2 data-t="tren_berat">Tren Berat Badan</h2>
+      <svg class="trend" id="trend" viewBox="0 0 300 92" preserveAspectRatio="none"></svg>
+      <div class="faint" id="trend-empty" data-t="tren_kosong">Belum cukup data. Catat berat badan tiap minggu.</div>
+    </div>
+
+    <div class="card">
+      <h2 data-t="minggu_ini">Minggu Ini</h2>
+      <div class="stats">
+        <div class="stat"><div class="n" id="s-latihan">—</div><div class="l" data-t="sesi_latihan">sesi latihan</div></div>
+        <div class="stat"><div class="n" id="s-langkah">—</div><div class="l" data-t="rata_langkah">rata langkah</div></div>
+        <div class="stat"><div class="n" id="s-tidur">—</div><div class="l" data-t="rata_tidur">rata tidur</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 data-t="riwayat">Riwayat</h2>
+      <table><thead><tr>
+        <th data-t="tgl">Tanggal</th><th class="num" data-t="berat_s">Berat</th>
+        <th class="num" data-t="perut_s">Perut</th><th class="num" data-t="langkah_s">Langkah</th>
+        <th class="num" data-t="tidur_s">Tidur</th></tr></thead>
+        <tbody id="hist"></tbody></table>
+      <div class="faint" id="hist-empty" style="display:none" data-t="belum_ada">Belum ada riwayat.</div>
+    </div>
+
+    <div class="card">
+      <h2 data-t="ringkasan">Ringkasan untuk Dianalisa</h2>
+      <div class="faint" data-t="ringkasan_ket">Salin, lalu tempel ke chat untuk dianalisa.</div>
+      <button class="btn ghost" id="btn-salin" data-t="salin">Salin Ringkasan Minggu Ini</button>
+      <textarea id="ringkasan" readonly style="display:none"></textarea>
+    </div>
+  </div>
+
+  <!-- ATUR -->
+  <div class="view" id="v-set">
+    <h1 data-t="atur">Pengaturan</h1>
+
+    <div class="card">
+      <h2 data-t="akun">Akun</h2>
+      <div class="row"><span class="t" data-t="nama">Nama</span><strong id="s-nama">—</strong></div>
+      <div class="row"><span class="t" data-t="level">Level</span><strong id="s-level">—</strong></div>
+      <div class="row"><span class="t" data-t="grup">Grup</span><strong id="s-grup">—</strong></div>
+      <div class="row"><span class="t" data-t="berlaku">Berlaku sampai</span><strong id="s-berlaku">—</strong></div>
+      <div class="row"><span class="t" data-t="mulai">Mulai program</span>
+        <input type="date" id="i-mulai" style="width:auto"></div>
     </div>
 
     <div class="card">
       <h2 data-t="privasi">Privasi</h2>
       <div class="row">
-        <div><div data-t="izin_grup">Teman satu grup boleh melihat status disiplin saya</div>
-             <div class="faint" data-t="izin_grup_ket">Hanya centang selesai/tidak — bukan isi catatan makan atau latihan.</div></div>
+        <div><div class="t" data-t="izin_grup">Teman satu grup boleh melihat status disiplin saya</div>
+             <div class="faint" data-t="izin_grup_ket"></div></div>
         <label class="sw"><input type="checkbox" id="sw-grup"><span></span></label>
       </div>
       <div class="row">
-        <div><div data-t="izin_adm_ring">Admin boleh melihat ringkasan progres saya</div>
-             <div class="faint" data-t="izin_adm_ring_ket">Persentase latihan & tren berat. Tidak termasuk catatan makan, tidur, atau kebiasaan.</div></div>
+        <div><div class="t" data-t="izin_adm_ring">Admin boleh melihat ringkasan progres saya</div>
+             <div class="faint" data-t="izin_adm_ring_ket"></div></div>
         <label class="sw"><input type="checkbox" id="sw-adm1"><span></span></label>
       </div>
       <div class="row">
-        <div><div data-t="izin_adm_det">Admin boleh melihat detail latihan saya</div>
-             <div class="faint" data-t="izin_adm_det_ket">Beban dan set per gerakan.</div></div>
+        <div><div class="t" data-t="izin_adm_det">Admin boleh melihat detail latihan saya</div>
+             <div class="faint" data-t="izin_adm_det_ket"></div></div>
         <label class="sw"><input type="checkbox" id="sw-adm2"><span></span></label>
       </div>
-      <div class="faint" style="margin-top:12px" data-t="privasi_ket">
-        Jawaban skrining kesehatan Anda tidak pernah bisa dilihat siapa pun, termasuk admin —
-        apa pun pengaturan di atas. Semua izin bisa dimatikan kapan saja.
+      <div class="faint" style="margin-top:10px" data-t="privasi_ket"></div>
+    </div>
+
+    <div class="card">
+      <h2 data-t="modul">Modul Opsional</h2>
+      <div class="row">
+        <div><div class="t" data-t="modul_kebiasaan">Pelacak kebiasaan</div>
+             <div class="faint" data-t="modul_kebiasaan_ket">Mencatat rokok, alkohol, atau kebiasaan lain. Mati secara default.</div></div>
+        <label class="sw"><input type="checkbox" id="sw-habit"><span></span></label>
+      </div>
+      <div id="habit-conf" style="display:none">
+        <label data-t="kebiasaan_dilacak">Yang dilacak (pisahkan koma)</label>
+        <input type="text" id="i-habits" placeholder="rokok, alkohol">
+        <button class="btn ghost" id="btn-habits" data-t="simpan">Simpan</button>
       </div>
     </div>
 
     <div class="card">
-      <h2 data-t="tahap">Tahap Pembangunan</h2>
-      <p class="faint" data-t="tahap_ket">Fondasi selesai: akun, token grup, onboarding, skrining, penyimpanan offline, dwibahasa.
-      Berikutnya: pustaka gerakan, program 12 minggu, pencatatan harian, peta otot.</p>
+      <h2 data-t="tampilan">Tampilan</h2>
+      <div style="display:flex;gap:8px">
+        <button class="small" data-theme="auto" data-t="ikut_sistem">Ikut sistem</button>
+        <button class="small" data-theme="dark" data-t="gelap">Gelap</button>
+        <button class="small" data-theme="light" data-t="terang">Terang</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 data-t="data">Data</h2>
+      <div class="faint" id="sync-info">—</div>
     </div>
 
     <button class="btn ghost" id="btn-logout" data-t="keluar">Keluar</button>
   </div>
-
 </div>
 
+<div class="tabs" id="tabs" style="display:none">
+  <button class="tab on" data-view="v-today"><span class="ic">📋</span><span data-t="tab_hari">Hari Ini</span></button>
+  <button class="tab" data-view="v-prog"><span class="ic">📈</span><span data-t="tab_progres">Progres</span></button>
+  <button class="tab" data-view="v-set"><span class="ic">⚙️</span><span data-t="tab_atur">Atur</span></button>
+</div>
+
+<div class="modal" id="modal"><div class="sheet" id="sheet"></div></div>
 <div id="sync"></div>
 
 <script type="module">
 // =====================================================================
-// KONFIGURASI — isi dua nilai ini dari Supabase → Settings → API
+// KONFIGURASI
 // =====================================================================
 const SUPABASE_URL      = "https://ruuktccgpwgcjjviisxe.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ1dWt0Y2NncHdnY2pqdmlpc3hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk1NTM5NTYsImV4cCI6MjEwNTEyOTk1Nn0.8KagVJu7YqhXM_9JXUZBKmeWxitBIzBICm8tIE9mXOo";
 
-// Nama aplikasi — ubah di satu tempat ini saja
 const APP_NAMA    = "SegBu";
-const APP_TAGLINE = { id: "Jurnal kebugaran harian Anda.", en: "Your daily fit journal." };
+const APP_TAGLINE = { id:"Jurnal kebugaran harian Anda.", en:"Your daily fit journal." };
 
 // =====================================================================
 // i18n
 // =====================================================================
 const T = {
-  id:{
-    memuat:"Memuat…", judul:APP_NAMA, subjudul:"",
-    masuk:"Masuk", daftar:"Daftar", email:"Email", sandi:"Kata sandi",
-    kode_grup:"Kode grup", cek_kode:"Periksa kode", nama:"Nama", buat_akun:"Buat akun",
-    sandi_min:"Minimal 8 karakter.", lanjut:"Lanjut", kembali:"Kembali", keluar:"Keluar",
-    status_akun:"Status Akun", level:"Level", grup:"Grup", berlaku:"Berlaku sampai",
-    privasi:"Privasi", tahap:"Tahap Pembangunan",
-    izin_grup:"Teman satu grup boleh melihat status disiplin saya",
-    izin_grup_ket:"Hanya centang selesai/tidak — bukan isi catatan makan atau latihan.",
-    izin_adm_ring:"Admin boleh melihat ringkasan progres saya",
-    izin_adm_ring_ket:"Persentase latihan & tren berat. Tidak termasuk catatan makan, tidur, atau kebiasaan.",
-    izin_adm_det:"Admin boleh melihat detail latihan saya",
-    izin_adm_det_ket:"Beban dan set per gerakan.",
-    privasi_ket:"Jawaban skrining kesehatan Anda tidak pernah bisa dilihat siapa pun, termasuk admin — apa pun pengaturan di atas. Semua izin bisa dimatikan kapan saja.",
-    tahap_ket:"Fondasi selesai: akun, token grup, onboarding, skrining, penyimpanan offline, dwibahasa. Berikutnya: pustaka gerakan, program 12 minggu, pencatatan harian, peta otot.",
-    offline:"Offline — tersimpan di perangkat", nunggu:"%n menunggu sinkron", tersinkron:"Tersinkron"
-  },
-  en:{
-    memuat:"Loading…", judul:APP_NAMA, subjudul:"",
-    masuk:"Sign in", daftar:"Register", email:"Email", sandi:"Password",
-    kode_grup:"Group code", cek_kode:"Check code", nama:"Name", buat_akun:"Create account",
-    sandi_min:"At least 8 characters.", lanjut:"Continue", kembali:"Back", keluar:"Sign out",
-    status_akun:"Account", level:"Level", grup:"Group", berlaku:"Valid until",
-    privasi:"Privacy", tahap:"Build Stage",
-    izin_grup:"Group members may see my consistency status",
-    izin_grup_ket:"Only done/not-done ticks — never your meal or workout details.",
-    izin_adm_ring:"Admin may see my progress summary",
-    izin_adm_ring_ket:"Workout completion & weight trend. Excludes meals, sleep and habits.",
-    izin_adm_det:"Admin may see my workout details",
-    izin_adm_det_ket:"Load and sets per exercise.",
-    privasi_ket:"Your health screening answers can never be read by anyone, including the admin — regardless of the settings above. Every permission can be switched off at any time.",
-    tahap_ket:"Foundation done: accounts, group tokens, onboarding, screening, offline storage, bilingual. Next: exercise library, 12-week programs, daily logging, muscle map.",
-    offline:"Offline — saved on device", nunggu:"%n waiting to sync", tersinkron:"Synced"
-  }
+ id:{ memuat:"Memuat…", judul:APP_NAMA, subjudul:"", masuk:"Masuk", daftar:"Daftar",
+  email:"Email", sandi:"Kata sandi", kode_grup:"Kode grup", cek_kode:"Periksa kode",
+  nama:"Nama", buat_akun:"Buat akun", sandi_min:"Minimal 8 karakter.", lanjut:"Lanjut",
+  kembali:"Kembali", keluar:"Keluar", level:"Level", grup:"Grup", berlaku:"Berlaku sampai",
+  mulai:"Mulai program", privasi:"Privasi", akun:"Akun", atur:"Pengaturan",
+  izin_grup:"Teman satu grup boleh melihat status disiplin saya",
+  izin_grup_ket:"Hanya centang selesai/tidak — bukan isi catatan makan atau latihan.",
+  izin_adm_ring:"Admin boleh melihat ringkasan progres saya",
+  izin_adm_ring_ket:"Persentase latihan & tren berat. Tidak termasuk makan, tidur, atau kebiasaan.",
+  izin_adm_det:"Admin boleh melihat detail latihan saya", izin_adm_det_ket:"Beban dan set per gerakan.",
+  privasi_ket:"Jawaban skrining kesehatan Anda tidak pernah bisa dilihat siapa pun, termasuk admin. Semua izin bisa dimatikan kapan saja.",
+  aktivitas:"Aktivitas Hari Ini", catatan_harian:"Catatan Harian", langkah:"Langkah",
+  jam_tidur:"Jam tidur", jam_bangun:"Jam bangun", durasi_tidur:"Durasi tidur",
+  terbangun:"Terbangun tengah malam", terbangun_ket:"Dan sulit tidur lagi.",
+  makan:"Makan", tambah_makan:"Tambah catatan makan", kebiasaan:"Kebiasaan",
+  progres:"Progres", progres_sub:"Yang dikejar tren, bukan angka sempurna tiap hari.",
+  ukuran:"Berat & Ukuran", berat:"Berat badan (kg)", perut:"Lingkar perut (cm)",
+  pinggang:"Lingkar pinggang (cm)", pinggul:"Lingkar pinggul (cm)", lengan:"Lingkar lengan (cm)",
+  paha:"Lingkar paha (cm)", ukuran_lain:"Ukuran lainnya",
+  ukuran_ket:"Cukup 2 minggu sekali, pagi sebelum makan. Mengukur tiap hari hanya menghasilkan naik-turun acak.",
+  tren_berat:"Tren Berat Badan", tren_kosong:"Belum cukup data. Catat berat badan tiap minggu.",
+  minggu_ini:"Minggu Ini", sesi_latihan:"sesi latihan", rata_langkah:"rata langkah", rata_tidur:"rata tidur",
+  riwayat:"Riwayat", tgl:"Tanggal", berat_s:"Berat", perut_s:"Perut", langkah_s:"Langkah", tidur_s:"Tidur",
+  belum_ada:"Belum ada riwayat.", ringkasan:"Ringkasan untuk Dianalisa",
+  ringkasan_ket:"Salin, lalu tempel ke chat untuk dianalisa.", salin:"Salin Ringkasan Minggu Ini",
+  modul:"Modul Opsional", modul_kebiasaan:"Pelacak kebiasaan",
+  modul_kebiasaan_ket:"Mencatat rokok, alkohol, atau kebiasaan lain. Mati secara default.",
+  kebiasaan_dilacak:"Yang dilacak (pisahkan koma)", simpan:"Simpan",
+  tampilan:"Tampilan", ikut_sistem:"Ikut sistem", gelap:"Gelap", terang:"Terang", data:"Data",
+  tab_hari:"Hari Ini", tab_progres:"Progres", tab_atur:"Atur",
+  offline:"Offline — tersimpan di perangkat", nunggu:"%n menunggu sinkron",
+  latihan_selesai:"✓ Latihan Selesai", tandai:"Tandai Latihan Selesai",
+  istirahat:"Istirahat penuh. Tidak ada latihan hari ini.",
+  jalan_santai:"Jalan santai — tidak perlu latihan.",
+  cardio:"Cardio ringan: jalan, sepeda statis, atau renang.",
+  target:"Target %n langkah", kg_tangan:"kg/tangan", tanpa_beban:"tanpa beban",
+  cara:"Cara melakukan", salah:"Kesalahan umum", kenapa:"Kenapa penting",
+  otot_utama:"Otot utama", otot_pendukung:"Pendukung", tutup:"Tutup",
+  porsi_kecil:"Kecil", porsi_sedang:"Sedang", porsi_normal:"Normal", porsi_banyak:"Banyak",
+  hapus:"Hapus", tersalin:"Tersalin!", belum_makan:"Belum ada catatan makan hari ini."
+ },
+ en:{ memuat:"Loading…", judul:APP_NAMA, subjudul:"", masuk:"Sign in", daftar:"Register",
+  email:"Email", sandi:"Password", kode_grup:"Group code", cek_kode:"Check code",
+  nama:"Name", buat_akun:"Create account", sandi_min:"At least 8 characters.", lanjut:"Continue",
+  kembali:"Back", keluar:"Sign out", level:"Level", grup:"Group", berlaku:"Valid until",
+  mulai:"Program start", privasi:"Privacy", akun:"Account", atur:"Settings",
+  izin_grup:"Group members may see my consistency status",
+  izin_grup_ket:"Only done/not-done ticks — never your meal or workout details.",
+  izin_adm_ring:"Admin may see my progress summary",
+  izin_adm_ring_ket:"Workout completion & weight trend. Excludes meals, sleep and habits.",
+  izin_adm_det:"Admin may see my workout details", izin_adm_det_ket:"Load and sets per exercise.",
+  privasi_ket:"Your health screening answers can never be read by anyone, including the admin. Every permission can be switched off at any time.",
+  aktivitas:"Today's Activity", catatan_harian:"Daily Log", langkah:"Steps",
+  jam_tidur:"Bedtime", jam_bangun:"Wake time", durasi_tidur:"Sleep duration",
+  terbangun:"Woke during the night", terbangun_ket:"And struggled to fall back asleep.",
+  makan:"Meals", tambah_makan:"Add meal entry", kebiasaan:"Habits",
+  progres:"Progress", progres_sub:"Trend is what matters, not a perfect number each day.",
+  ukuran:"Weight & Measurements", berat:"Body weight (kg)", perut:"Belly circumference (cm)",
+  pinggang:"Waist (cm)", pinggul:"Hips (cm)", lengan:"Upper arm (cm)", paha:"Thigh (cm)",
+  ukuran_lain:"Other measurements",
+  ukuran_ket:"Every two weeks is enough, in the morning before eating. Daily measuring only produces random noise.",
+  tren_berat:"Weight Trend", tren_kosong:"Not enough data yet. Log your weight weekly.",
+  minggu_ini:"This Week", sesi_latihan:"workouts", rata_langkah:"avg steps", rata_tidur:"avg sleep",
+  riwayat:"History", tgl:"Date", berat_s:"Weight", perut_s:"Belly", langkah_s:"Steps", tidur_s:"Sleep",
+  belum_ada:"No history yet.", ringkasan:"Summary for Analysis",
+  ringkasan_ket:"Copy, then paste into chat for analysis.", salin:"Copy This Week's Summary",
+  modul:"Optional Modules", modul_kebiasaan:"Habit tracker",
+  modul_kebiasaan_ket:"Log smoking, alcohol or any other habit. Off by default.",
+  kebiasaan_dilacak:"What to track (comma separated)", simpan:"Save",
+  tampilan:"Appearance", ikut_sistem:"Follow system", gelap:"Dark", terang:"Light", data:"Data",
+  tab_hari:"Today", tab_progres:"Progress", tab_atur:"Settings",
+  offline:"Offline — saved on device", nunggu:"%n waiting to sync",
+  latihan_selesai:"✓ Workout Done", tandai:"Mark Workout Done",
+  istirahat:"Full rest. No training today.",
+  jalan_santai:"Easy walking — no workout needed.",
+  cardio:"Light cardio: walk, stationary bike, or swim.",
+  target:"Target %n steps", kg_tangan:"kg/hand", tanpa_beban:"bodyweight",
+  cara:"How to do it", salah:"Common mistake", kenapa:"Why it matters",
+  otot_utama:"Primary muscles", otot_pendukung:"Supporting", tutup:"Close",
+  porsi_kecil:"Small", porsi_sedang:"Medium", porsi_normal:"Normal", porsi_banyak:"Large",
+  hapus:"Delete", tersalin:"Copied!", belum_makan:"No meals logged today."
+ }
 };
 let lang = localStorage.getItem("lang") || (navigator.language||"id").slice(0,2);
 if (!T[lang]) lang = "id";
-const t = k => (T[lang] && T[lang][k]) || (T.id[k] || k);
+const t = k => (T[lang]&&T[lang][k]) || T.id[k] || k;
+const L = o => !o ? "" : (typeof o==="string" ? o : (o[lang] ?? o.id ?? ""));
 
 function applyLang(){
   document.documentElement.lang = lang;
@@ -283,548 +535,867 @@ function applyLang(){
   const sj = document.querySelector('[data-t="subjudul"]');
   if (sj) sj.textContent = APP_TAGLINE[lang] || APP_TAGLINE.id;
   document.querySelectorAll(".lang button").forEach(b=>b.classList.toggle("on", b.dataset.lang===lang));
-  if (state.step >= 0) renderOnb();
+  if (state.step>=0 && document.getElementById("v-onb").classList.contains("on")) renderOnb();
+  if (state.siap) { renderToday(); renderProg(); renderSet(); }
 }
 document.querySelectorAll(".lang button").forEach(b=>{
-  b.addEventListener("click", ()=>{ lang=b.dataset.lang; localStorage.setItem("lang",lang); applyLang(); });
+  b.onclick = ()=>{ lang=b.dataset.lang; localStorage.setItem("lang",lang); applyLang(); };
 });
 
 // =====================================================================
-// PENYIMPANAN OFFLINE — IndexedDB + antrean kirim (outbox)
-// Setiap tulisan masuk ke sini DULU, baru menyusul ke server.
+// OFFLINE: IndexedDB + antrean kirim
 // =====================================================================
-const DB_NAME="fitapp", DB_VER=1;
-let idb = null;
-function openDB(){
-  return new Promise((res,rej)=>{
-    const r = indexedDB.open(DB_NAME, DB_VER);
-    r.onupgradeneeded = e=>{
-      const db = e.target.result;
-      if(!db.objectStoreNames.contains("outbox")) db.createObjectStore("outbox",{keyPath:"id"});
-      if(!db.objectStoreNames.contains("cache"))  db.createObjectStore("cache",{keyPath:"k"});
-    };
-    r.onsuccess = ()=>res(r.result);
-    r.onerror   = ()=>rej(r.error);
-  });
-}
-function tx(store, mode, fn){
-  return new Promise((res,rej)=>{
-    const t = idb.transaction(store, mode), s = t.objectStore(store);
-    const out = fn(s);
-    t.oncomplete = ()=>res(out && out.result !== undefined ? out.result : out);
-    t.onerror    = ()=>rej(t.error);
-  });
-}
-const cacheSet = (k,v)=> tx("cache","readwrite", s=>s.put({k,v}));
-const cacheGet = k => tx("cache","readonly", s=>s.get(k)).then(r=>r&&r.value);
+let idb=null;
+function openDB(){return new Promise((res,rej)=>{
+  const r=indexedDB.open("fitapp",1);
+  r.onupgradeneeded=e=>{const d=e.target.result;
+    if(!d.objectStoreNames.contains("outbox"))d.createObjectStore("outbox",{keyPath:"id"});
+    if(!d.objectStoreNames.contains("cache"))d.createObjectStore("cache",{keyPath:"k"});};
+  r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error);});}
+function tx(store,mode,fn){return new Promise((res,rej)=>{
+  const t=idb.transaction(store,mode),s=t.objectStore(store);const q=fn(s);
+  t.oncomplete=()=>res(q&&q.result!==undefined?q.result:q); t.onerror=()=>rej(t.error);});}
+const cacheSet=(k,v)=>tx("cache","readwrite",s=>s.put({k,v}));
+const cacheGet=k=>tx("cache","readonly",s=>s.get(k)).then(r=>r&&r.value);
 
-// Simpan perubahan: lokal dulu, antre untuk dikirim.
-async function simpan(tabel, baris){
-  baris.id = baris.id || crypto.randomUUID();      // ID dibuat DI PERANGKAT
+// Simpan: lokal dulu, antre kirim. onConflict untuk tabel ber-unique(user_id,tanggal).
+async function simpan(tabel, baris, onConflict){
+  baris.id = baris.id || crypto.randomUUID();
   baris.updated_at = new Date().toISOString();
-  await tx("outbox","readwrite", s=>s.put({ id: crypto.randomUUID(), tabel, baris, ts: Date.now() }));
-  kirimAntrean();
-  return baris;
+  await tx("outbox","readwrite", s=>s.put({id:crypto.randomUUID(), tabel, baris, onConflict, ts:Date.now()}));
+  kirim(); return baris;
 }
-async function antreanIsi(){
-  return tx("outbox","readonly", s=>s.getAll()).then(r=>r||[]);
-}
-let sedangKirim = false;
-async function kirimAntrean(){
-  if (sedangKirim || !navigator.onLine || !sb || !state.user) return tampilSync();
-  sedangKirim = true;
+const antrean = ()=>tx("outbox","readonly",s=>s.getAll()).then(r=>r||[]);
+let mengirim=false;
+async function kirim(){
+  if(mengirim||!navigator.onLine||!sb||!state.user) return tampilSync();
+  mengirim=true;
   try{
-    const items = await antreanIsi();
-    for (const it of items){
-      const { error } = await sb.from(it.tabel).upsert(it.baris);
-      if (error) break;                              // gagal → biarkan di antrean
-      await tx("outbox","readwrite", s=>s.delete(it.id));
+    const items=(await antrean()).sort((a,b)=>a.ts-b.ts);
+    for(const it of items){
+      const q = it.onConflict
+        ? sb.from(it.tabel).upsert(it.baris,{onConflict:it.onConflict})
+        : sb.from(it.tabel).upsert(it.baris);
+      const {error}=await q;
+      if(error){ console.warn("sync",it.tabel,error.message); break; }
+      await tx("outbox","readwrite",s=>s.delete(it.id));
     }
-  } finally { sedangKirim = false; tampilSync(); }
+  } finally { mengirim=false; tampilSync(); }
 }
 async function tampilSync(){
-  const el = document.getElementById("sync");
-  const n = (await antreanIsi()).length;
-  el.className = "";
-  if (!navigator.onLine){ el.textContent = t("offline"); el.classList.add("show","offline"); }
-  else if (n > 0){ el.textContent = t("nunggu").replace("%n", n); el.classList.add("show"); }
-  else { el.classList.remove("show"); }
+  const el=document.getElementById("sync"); const n=(await antrean()).length;
+  el.className="";
+  if(!navigator.onLine){el.textContent=t("offline");el.classList.add("show","offline");}
+  else if(n>0){el.textContent=t("nunggu").replace("%n",n);el.classList.add("show");}
+  const info=document.getElementById("sync-info");
+  if(info) info.textContent = !navigator.onLine ? t("offline")
+    : n>0 ? t("nunggu").replace("%n",n)
+    : (lang==="id"?"Semua tersinkron.":"Everything synced.");
 }
-window.addEventListener("online", ()=>{ kirimAntrean(); });
-window.addEventListener("offline", tampilSync);
+addEventListener("online",kirim); addEventListener("offline",tampilSync);
 
 // =====================================================================
 // SUPABASE
 // =====================================================================
-let sb = null;
+let sb=null;
 async function initSupabase(){
-  if(!SUPABASE_URL || !SUPABASE_ANON_KEY) return false;
-  const { createClient } = await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");
-  sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-    auth:{ persistSession:true, storage:window.localStorage, autoRefreshToken:true }
-  });
+  if(!SUPABASE_URL||!SUPABASE_ANON_KEY) return false;
+  const {createClient}=await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");
+  sb=createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{persistSession:true,storage:localStorage,autoRefreshToken:true}});
   return true;
 }
 
 // =====================================================================
-// STATE & NAVIGASI
+// PROGRAM — sementara di sisi klien, pindah ke database pada Tahap 3
 // =====================================================================
-const state = { user:null, profil:null, step:-1, jawab:{}, grup:null };
+const GERAK = {
+  "chair-squat":{n:{id:"Squat ke Kursi",en:"Chair Squat"},bw:true},
+  "sit-to-stand":{n:{id:"Sit-to-Stand",en:"Sit-to-Stand"},bw:true},
+  "glute-bridge":{n:{id:"Glute Bridge",en:"Glute Bridge"},bw:true},
+  "rdl":{n:{id:"Romanian Deadlift",en:"Romanian Deadlift"},bw:false,kg:5},
+  "floor-press":{n:{id:"Floor Press",en:"Floor Press"},bw:false,kg:5},
+  "wall-pushup":{n:{id:"Wall Push-up",en:"Wall Push-up"},bw:true},
+  "db-row":{n:{id:"Dumbbell Row",en:"Dumbbell Row"},bw:false,kg:5},
+  "band-row":{n:{id:"Band Row Duduk",en:"Seated Band Row"},bw:true},
+  "shoulder-press":{n:{id:"Shoulder Press",en:"Shoulder Press"},bw:false,kg:2},
+  "biceps-curl":{n:{id:"Biceps Curl",en:"Biceps Curl"},bw:false,kg:2},
+  "triceps-dip":{n:{id:"Trisep Dip Kursi",en:"Chair Triceps Dip"},bw:true},
+  "dead-bug":{n:{id:"Dead Bug",en:"Dead Bug"},bw:true},
+  "plank":{n:{id:"Plank",en:"Plank"},bw:true},
+  "bird-dog":{n:{id:"Bird Dog",en:"Bird Dog"},bw:true}
+};
+// fase 1 (mg 1-2), 2 (3-4), 3 (5-8), 4 (9-12)
+const PROGRAM = {
+  easy:{
+    A:[["chair-squat",2,"8"],["db-row",2,"10"],["floor-press",2,"10"],["glute-bridge",2,"10"],["shoulder-press",2,"8"]],
+    B:[["sit-to-stand",2,"8"],["band-row",2,"10"],["wall-pushup",2,"8"],["glute-bridge",2,"12"],["dead-bug",2,"6/sisi"],["bird-dog",2,"6/sisi"]]
+  },
+  medium:{
+    A:[["chair-squat",3,"10"],["rdl",3,"10"],["floor-press",3,"10"],["db-row",3,"10"],["shoulder-press",2,"10"],["plank",2,"20 detik"]],
+    B:[["sit-to-stand",3,"12"],["glute-bridge",3,"12"],["floor-press",3,"10"],["db-row",3,"10"],["biceps-curl",2,"10"],["dead-bug",3,"8/sisi"]]
+  },
+  pro:{
+    A:[["chair-squat",3,"12"],["rdl",3,"10"],["floor-press",3,"8-12"],["db-row",3,"8-12"],["shoulder-press",3,"8-12"],["plank",3,"30 detik"]],
+    B:[["sit-to-stand",3,"12"],["glute-bridge",3,"15"],["triceps-dip",3,"8-12"],["db-row",3,"8-12"],["biceps-curl",2,"12"],["bird-dog",3,"8/sisi"]]
+  }
+};
+const HARI = {id:["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"],
+              en:["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]};
+const BULAN = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
+
+function jadwalHari(dow, hariPerMinggu){
+  // 3 hari: Sen/Rab/Jum · 4 hari: + Sabtu latihan ringan
+  const map3 = {1:"A",3:"B",5:"A",2:"ringan",4:"ringan",6:"cardio",0:"rest"};
+  const map4 = {1:"A",3:"B",5:"A",6:"B",2:"ringan",4:"ringan",0:"rest"};
+  const map2 = {1:"A",4:"B",2:"ringan",3:"ringan",5:"ringan",6:"cardio",0:"rest"};
+  return (hariPerMinggu>=4?map4:hariPerMinggu<=2?map2:map3)[dow];
+}
+const fmt = d => d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+const parse = s => { const p=s.split("-").map(Number); return new Date(p[0],p[1]-1,p[2]); };
+const addH = (d,n)=>{const r=new Date(d); r.setDate(r.getDate()+n); return r;};
+const hariKe = (mulai,d)=>Math.floor((new Date(d.getFullYear(),d.getMonth(),d.getDate())-parse(mulai))/86400000);
+const mingguKe = (mulai,d)=>Math.max(1,Math.floor(hariKe(mulai,d)/7)+1);
+const senin = d => addH(d, d.getDay()===0?-6:1-d.getDay());
+function targetLangkah(mg){ return mg<=1?2500:mg<=2?3000:mg<=4?3500:mg<=8?4500:5000; }
+
+// =====================================================================
+// STATE
+// =====================================================================
+const state = { user:null, profil:null, step:-1, jawab:{}, grup:null, siap:false,
+                mulai:null, hari:{}, sesi:null, sets:[], makan:[], kebiasaan:[], ukuran:null,
+                tanggal:fmt(new Date()) };
 const show = id => document.querySelectorAll(".view").forEach(v=>v.classList.toggle("on", v.id===id));
-const pesan = (el, teks, jenis="err") =>
-  document.getElementById(el).innerHTML = teks ? `<div class="msg ${jenis}">${teks}</div>` : "";
+const pesan = (el,teks,jenis="err") => { const e=document.getElementById(el);
+  if(e) e.innerHTML = teks?`<div class="msg ${jenis}">${teks}</div>`:""; };
 
 // =====================================================================
 // AUTH
 // =====================================================================
-document.getElementById("tab-login").onclick = ()=>{
+document.getElementById("tab-login").onclick=()=>{
   document.getElementById("tab-login").classList.add("on");
   document.getElementById("tab-daftar").classList.remove("on");
   document.getElementById("form-login").style.display="";
-  document.getElementById("form-daftar").style.display="none";
-  pesan("auth-msg","");
-};
-document.getElementById("tab-daftar").onclick = ()=>{
+  document.getElementById("form-daftar").style.display="none"; pesan("auth-msg","");};
+document.getElementById("tab-daftar").onclick=()=>{
   document.getElementById("tab-daftar").classList.add("on");
   document.getElementById("tab-login").classList.remove("on");
   document.getElementById("form-daftar").style.display="";
-  document.getElementById("form-login").style.display="none";
-  pesan("auth-msg","");
-};
+  document.getElementById("form-login").style.display="none"; pesan("auth-msg","");};
 
-document.getElementById("btn-cek").onclick = async ()=>{
-  const kode = document.getElementById("d-kode").value.trim();
-  if(!kode) return;
-  const { data, error } = await sb.rpc("cek_token", { p_kode: kode });
-  const box = document.getElementById("kode-info");
-  if (error){ box.innerHTML = `<div class="msg err">${error.message}</div>`; return; }
-  if (!data.ok){
-    const teks = data.error === "kode_tidak_ditemukan"
-      ? (lang==="id"?"Kode tidak ditemukan.":"Code not found.")
-      : data.error === "kode_tidak_aktif"
-      ? (lang==="id"?"Kode sudah tidak aktif.":"Code is no longer active.")
-      : (lang==="id"?"Kuota grup ini sudah penuh.":"This group is full.");
-    box.innerHTML = `<div class="msg err">${teks}</div>`;
-    document.getElementById("daftar-lanjut").style.display="none";
-    return;
-  }
-  // Tampilkan sisa masa berlaku SEBELUM orang terlanjur mendaftar
-  let info = lang==="id"
-    ? `Grup <strong>${data.nama_group}</strong> — sisa ${data.sisa_seat} kursi.`
-    : `Group <strong>${data.nama_group}</strong> — ${data.sisa_seat} seats left.`;
-  if (data.berakhir_pada){
-    const hari = Math.ceil((new Date(data.berakhir_pada) - Date.now())/86400000);
-    info += lang==="id"
-      ? `<br>Periode grup berakhir ${new Date(data.berakhir_pada).toLocaleDateString("id-ID")} — sisa ${hari} hari.`
-      : `<br>Group period ends ${new Date(data.berakhir_pada).toLocaleDateString("en-GB")} — ${hari} days left.`;
-  } else {
-    info += lang==="id" ? "<br>Tanpa batas waktu." : "<br>No time limit.";
-  }
-  box.innerHTML = `<div class="msg ok">${info}</div>`;
-  document.getElementById("daftar-lanjut").style.display="";
-};
+document.getElementById("btn-cek").onclick=async()=>{
+  const kode=document.getElementById("d-kode").value.trim(); if(!kode)return;
+  const {data,error}=await sb.rpc("cek_token",{p_kode:kode});
+  const box=document.getElementById("kode-info");
+  if(error){box.innerHTML=`<div class="msg err">${error.message}</div>`;return;}
+  if(!data.ok){
+    const teks=data.error==="kode_tidak_ditemukan"?(lang==="id"?"Kode tidak ditemukan.":"Code not found.")
+      :data.error==="kode_tidak_aktif"?(lang==="id"?"Kode sudah tidak aktif.":"Code no longer active.")
+      :(lang==="id"?"Kuota grup ini sudah penuh.":"This group is full.");
+    box.innerHTML=`<div class="msg err">${teks}</div>`;
+    document.getElementById("daftar-lanjut").style.display="none";return;}
+  let info=lang==="id"?`Grup <strong>${data.nama_group}</strong> — sisa ${data.sisa_seat} kursi.`
+                      :`Group <strong>${data.nama_group}</strong> — ${data.sisa_seat} seats left.`;
+  if(data.berakhir_pada){
+    const h=Math.ceil((new Date(data.berakhir_pada)-Date.now())/86400000);
+    info+=lang==="id"?`<br>Periode berakhir ${new Date(data.berakhir_pada).toLocaleDateString("id-ID")} — sisa ${h} hari.`
+                     :`<br>Period ends ${new Date(data.berakhir_pada).toLocaleDateString("en-GB")} — ${h} days left.`;
+  } else info+=lang==="id"?"<br>Tanpa batas waktu.":"<br>No time limit.";
+  box.innerHTML=`<div class="msg ok">${info}</div>`;
+  document.getElementById("daftar-lanjut").style.display="";};
 
-document.getElementById("btn-daftar").onclick = async (e)=>{
-  const btn = e.target; btn.disabled = true;
+document.getElementById("btn-daftar").onclick=async e=>{
+  const b=e.target;b.disabled=true;
   try{
-    const kode  = document.getElementById("d-kode").value.trim();
-    const nama  = document.getElementById("d-nama").value.trim();
-    const email = document.getElementById("d-email").value.trim();
-    const pass  = document.getElementById("d-pass").value;
-    if (pass.length < 8){ pesan("auth-msg", t("sandi_min")); return; }
+    const kode=document.getElementById("d-kode").value.trim();
+    const nama=document.getElementById("d-nama").value.trim();
+    const email=document.getElementById("d-email").value.trim();
+    const pass=document.getElementById("d-pass").value;
+    if(pass.length<8){pesan("auth-msg",t("sandi_min"));return;}
+    const {data,error}=await sb.auth.signUp({email,password:pass,options:{data:{nama}}});
+    if(error){pesan("auth-msg",error.message);return;}
+    if(!data.session){pesan("auth-msg",lang==="id"
+      ?"Akun dibuat. Cek email untuk konfirmasi, lalu masuk.":"Account created. Check your email, then sign in.","ok");return;}
+    const {data:r}=await sb.rpc("redeem_token",{p_kode:kode});
+    if(r&&!r.ok){pesan("auth-msg","Token: "+r.error);return;}
+    await mulaiApp();
+  } finally{b.disabled=false;}};
 
-    const { data, error } = await sb.auth.signUp({
-      email, password: pass, options:{ data:{ nama } }
-    });
-    if (error){ pesan("auth-msg", error.message); return; }
-    if (!data.session){
-      pesan("auth-msg", lang==="id"
-        ? "Akun dibuat. Cek email Anda untuk konfirmasi, lalu masuk."
-        : "Account created. Check your email to confirm, then sign in.", "ok");
-      return;
-    }
-    const { data: r } = await sb.rpc("redeem_token", { p_kode: kode });
-    if (r && !r.ok){ pesan("auth-msg", "Token: " + r.error); return; }
-    await mulai();
-  } finally { btn.disabled = false; }
-};
-
-document.getElementById("btn-login").onclick = async (e)=>{
-  const btn = e.target; btn.disabled = true;
+document.getElementById("btn-login").onclick=async e=>{
+  const b=e.target;b.disabled=true;
   try{
-    const { error } = await sb.auth.signInWithPassword({
-      email: document.getElementById("l-email").value.trim(),
-      password: document.getElementById("l-pass").value
-    });
-    if (error){ pesan("auth-msg", error.message); return; }
-    await mulai();
-  } finally { btn.disabled = false; }
-};
+    const {error}=await sb.auth.signInWithPassword({
+      email:document.getElementById("l-email").value.trim(),
+      password:document.getElementById("l-pass").value});
+    if(error){pesan("auth-msg",error.message);return;}
+    await mulaiApp();
+  } finally{b.disabled=false;}};
 
-document.getElementById("btn-logout").onclick = async ()=>{
-  await sb.auth.signOut();
-  location.reload();
-};
+document.getElementById("btn-logout").onclick=async()=>{await sb.auth.signOut();location.reload();};
 
 // =====================================================================
-// ONBOARDING — identitas, skrining kesehatan, kemampuan, sarana, tujuan
+// ONBOARDING
 // =====================================================================
-const SKRINING = [
-  { k:"jantung",  id:"Pernah didiagnosis masalah jantung, atau disarankan dokter hanya berolahraga di bawah pengawasan?", en:"Ever diagnosed with a heart condition, or told to exercise only under supervision?" },
-  { k:"dada",     id:"Nyeri dada saat aktivitas fisik, atau dalam sebulan terakhir saat istirahat?", en:"Chest pain during physical activity, or at rest in the past month?" },
-  { k:"pingsan",  id:"Pernah pingsan atau pusing berat karena aktivitas fisik?", en:"Ever lost balance from dizziness or lost consciousness during activity?" },
-  { k:"sendi",    id:"Masalah tulang atau sendi yang bisa memburuk karena latihan (lutut, punggung, bahu)?", en:"Bone or joint problem that could worsen with exercise (knee, back, shoulder)?" },
-  { k:"obat",     id:"Sedang minum obat tekanan darah atau jantung?", en:"Currently taking blood pressure or heart medication?" },
-  { k:"lain",     id:"Kondisi lain yang membuat aktivitas fisik berisiko bagi Anda?", en:"Any other reason physical activity could be risky for you?" },
-  { k:"hamil",    id:"Sedang hamil atau kurang dari 6 bulan pascamelahirkan?", en:"Pregnant or less than 6 months postpartum?", hanya:"wanita" }
-];
+const SKRINING=[
+ {k:"jantung",id:"Pernah didiagnosis masalah jantung, atau disarankan dokter hanya berolahraga di bawah pengawasan?",en:"Ever diagnosed with a heart condition, or told to exercise only under supervision?"},
+ {k:"dada",id:"Nyeri dada saat aktivitas fisik, atau dalam sebulan terakhir saat istirahat?",en:"Chest pain during physical activity, or at rest in the past month?"},
+ {k:"pingsan",id:"Pernah pingsan atau pusing berat karena aktivitas fisik?",en:"Ever fainted or felt severe dizziness from physical activity?"},
+ {k:"sendi",id:"Masalah tulang atau sendi yang bisa memburuk karena latihan (lutut, punggung, bahu)?",en:"Bone or joint problem that could worsen with exercise (knee, back, shoulder)?"},
+ {k:"obat",id:"Sedang minum obat tekanan darah atau jantung?",en:"Currently taking blood pressure or heart medication?"},
+ {k:"lain",id:"Kondisi lain yang membuat aktivitas fisik berisiko bagi Anda?",en:"Any other reason physical activity could be risky for you?"},
+ {k:"hamil",id:"Sedang hamil atau kurang dari 6 bulan pascamelahirkan?",en:"Pregnant or less than 6 months postpartum?",hanya:"wanita"}];
 
-const LANGKAH = [
-  // 0 — identitas
-  { judul:{id:"Tentang Anda",en:"About you"}, render(){
-      return `
-      <h1>${lang==="id"?"Tentang Anda":"About you"}</h1>
-      <div class="sub">${lang==="id"?"Dipakai untuk menyesuaikan program, bukan untuk dibagikan.":"Used to tailor your program, never shared."}</div>
-      <div class="card">
-        <label>${lang==="id"?"Jenis kelamin":"Gender"}</label>
-        <div class="opts row" data-group="gender">
-          ${["pria","wanita","lainnya"].map(g=>`<button class="opt ${state.jawab.gender===g?"on":""}" data-v="${g}">
-            ${lang==="id"?{pria:"Pria",wanita:"Wanita",lainnya:"Lainnya"}[g]:{pria:"Male",wanita:"Female",lainnya:"Other"}[g]}</button>`).join("")}
-        </div>
-        <label>${lang==="id"?"Tanggal lahir":"Date of birth"}</label>
-        <input type="date" id="f-lahir" value="${state.jawab.tanggal_lahir||""}">
-        <label>${lang==="id"?"Tinggi badan (cm)":"Height (cm)"}</label>
-        <input type="number" id="f-tinggi" value="${state.jawab.tinggi_cm||""}" inputmode="decimal">
-      </div>`;
-    },
-    simpan(){
-      state.jawab.tanggal_lahir = document.getElementById("f-lahir").value || null;
-      state.jawab.tinggi_cm = parseFloat(document.getElementById("f-tinggi").value)||null;
-      if(!state.jawab.gender) return lang==="id"?"Pilih jenis kelamin dulu.":"Please pick a gender.";
-    }},
+const LANGKAH=[
+ {render(){return `<h1>${lang==="id"?"Tentang Anda":"About you"}</h1>
+  <div class="sub">${lang==="id"?"Dipakai untuk menyesuaikan program, bukan untuk dibagikan.":"Used to tailor your program, never shared."}</div>
+  <div class="card">
+   <label>${lang==="id"?"Jenis kelamin":"Gender"}</label>
+   <div class="opts row" data-group="gender">${["pria","wanita","lainnya"].map(g=>
+     `<button class="opt ${state.jawab.gender===g?"on":""}" data-v="${g}">${lang==="id"
+       ?{pria:"Pria",wanita:"Wanita",lainnya:"Lainnya"}[g]:{pria:"Male",wanita:"Female",lainnya:"Other"}[g]}</button>`).join("")}</div>
+   <label>${lang==="id"?"Tanggal lahir":"Date of birth"}</label>
+   <input type="date" id="f-lahir" value="${state.jawab.tanggal_lahir||""}">
+   <label>${lang==="id"?"Tinggi badan (cm)":"Height (cm)"}</label>
+   <input type="number" id="f-tinggi" inputmode="decimal" value="${state.jawab.tinggi_cm||""}">
+  </div>`;},
+  simpan(){state.jawab.tanggal_lahir=document.getElementById("f-lahir").value||null;
+   state.jawab.tinggi_cm=parseFloat(document.getElementById("f-tinggi").value)||null;
+   if(!state.jawab.gender)return lang==="id"?"Pilih jenis kelamin dulu.":"Please pick a gender.";}},
 
-  // 1 — skrining kesehatan
-  { judul:{id:"Skrining Kesehatan",en:"Health Screening"}, render(){
-      const usia = state.jawab.tanggal_lahir
-        ? Math.floor((Date.now()-new Date(state.jawab.tanggal_lahir))/31557600000) : null;
-      state.jawab.usia = usia;
-      const daftar = SKRINING.filter(q=>!q.hanya || q.hanya===state.jawab.gender);
-      return `
-      <h1>${lang==="id"?"Skrining Kesehatan":"Health Screening"}</h1>
-      <div class="sub">${lang==="id"
-        ? "Jawaban ini tidak pernah bisa dilihat siapa pun, termasuk admin. Jawab sejujurnya — inilah yang menjaga keamanan Anda."
-        : "These answers can never be seen by anyone, including the admin. Answer honestly — this is what keeps you safe."}</div>
-      <div class="card">
-        ${daftar.map(q=>`
-          <div class="q">
-            <p>${q[lang]||q.id}</p>
-            <div class="yn" data-q="${q.k}">
-              <button data-v="ya"    class="${state.jawab["s_"+q.k]===true?"on-yes":""}">${lang==="id"?"Ya":"Yes"}</button>
-              <button data-v="tidak" class="${state.jawab["s_"+q.k]===false?"on-no":""}">${lang==="id"?"Tidak":"No"}</button>
-            </div>
-          </div>`).join("")}
-      </div>`;
-    },
-    simpan(){
-      const daftar = SKRINING.filter(q=>!q.hanya || q.hanya===state.jawab.gender);
-      for (const q of daftar){
-        if (state.jawab["s_"+q.k] === undefined)
-          return lang==="id" ? "Mohon jawab semua pertanyaan." : "Please answer every question.";
-      }
-      if (state.jawab.s_hamil === true)
-        return "__HAMIL__";
-    }},
+ {render(){const u=state.jawab.tanggal_lahir?Math.floor((Date.now()-new Date(state.jawab.tanggal_lahir))/31557600000):null;
+   state.jawab.usia=u;
+   const d=SKRINING.filter(q=>!q.hanya||q.hanya===state.jawab.gender);
+   return `<h1>${lang==="id"?"Skrining Kesehatan":"Health Screening"}</h1>
+   <div class="sub">${lang==="id"
+     ?"Jawaban ini tidak pernah bisa dilihat siapa pun, termasuk admin. Jawab sejujurnya — inilah yang menjaga keamanan Anda."
+     :"These answers can never be seen by anyone, including the admin. Answer honestly — this is what keeps you safe."}</div>
+   <div class="card">${d.map(q=>`<div class="q"><p>${q[lang]||q.id}</p>
+     <div class="yn" data-q="${q.k}">
+      <button data-v="ya" class="${state.jawab["s_"+q.k]===true?"on-yes":""}">${lang==="id"?"Ya":"Yes"}</button>
+      <button data-v="tidak" class="${state.jawab["s_"+q.k]===false?"on-no":""}">${lang==="id"?"Tidak":"No"}</button>
+     </div></div>`).join("")}</div>`;},
+  simpan(){const d=SKRINING.filter(q=>!q.hanya||q.hanya===state.jawab.gender);
+   for(const q of d) if(state.jawab["s_"+q.k]===undefined)
+     return lang==="id"?"Mohon jawab semua pertanyaan.":"Please answer every question.";
+   if(state.jawab.s_hamil===true) return "__HAMIL__";}},
 
-  // 2 — kemampuan saat ini
-  { judul:{id:"Kemampuan Saat Ini",en:"Current Ability"}, render(){
-      const f = (key, opsi) => `<div class="opts" data-group="${key}">
-        ${opsi.map(o=>`<button class="opt ${state.jawab[key]===o.v?"on":""}" data-v="${o.v}">${o[lang]||o.id}</button>`).join("")}</div>`;
-      return `
-      <h1>${lang==="id"?"Kemampuan Saat Ini":"Current Ability"}</h1>
-      <div class="sub">${lang==="id"?"Jawab apa adanya. Mulai terlalu berat adalah penyebab utama orang berhenti.":"Answer honestly. Starting too hard is the main reason people quit."}</div>
-      <div class="card">
-        <label>${lang==="id"?"Olahraga dalam 3 bulan terakhir":"Exercise in the past 3 months"}</label>
-        ${f("frekuensi",[
-          {v:"tidak", id:"Tidak pernah", en:"Never"},
-          {v:"1x",    id:"Sekitar 1× seminggu", en:"About once a week"},
-          {v:"2-3x",  id:"2–3× seminggu", en:"2–3× a week"},
-          {v:"4x",    id:"4× seminggu atau lebih", en:"4× a week or more"}])}
-        <label>${lang==="id"?"Bisa berdiri dari kursi tanpa bantuan tangan?":"Can you stand up from a chair without using your hands?"}</label>
-        ${f("kursi",[
-          {v:"ya",     id:"Ya, mudah", en:"Yes, easily"},
-          {v:"susah",  id:"Bisa, tapi berat", en:"Yes, but it's hard"},
-          {v:"tidak",  id:"Tidak bisa", en:"No"}])}
-        <label>${lang==="id"?"Bisa jalan 10 menit tanpa berhenti?":"Can you walk 10 minutes without stopping?"}</label>
-        ${f("jalan",[
-          {v:"ya",    id:"Ya", en:"Yes"},
-          {v:"susah", id:"Bisa, tapi terengah", en:"Yes, but out of breath"},
-          {v:"tidak", id:"Tidak bisa", en:"No"}])}
-      </div>`;
-    },
-    simpan(){
-      if(!state.jawab.frekuensi||!state.jawab.kursi||!state.jawab.jalan)
-        return lang==="id"?"Mohon jawab semua pertanyaan.":"Please answer every question.";
-    }},
+ {render(){const f=(k,o)=>`<div class="opts" data-group="${k}">${o.map(x=>
+    `<button class="opt ${state.jawab[k]===x.v?"on":""}" data-v="${x.v}">${x[lang]||x.id}</button>`).join("")}</div>`;
+   return `<h1>${lang==="id"?"Kemampuan Saat Ini":"Current Ability"}</h1>
+   <div class="sub">${lang==="id"?"Jawab apa adanya. Mulai terlalu berat adalah penyebab utama orang berhenti."
+     :"Answer honestly. Starting too hard is the main reason people quit."}</div>
+   <div class="card">
+    <label>${lang==="id"?"Olahraga dalam 3 bulan terakhir":"Exercise in the past 3 months"}</label>
+    ${f("frekuensi",[{v:"tidak",id:"Tidak pernah",en:"Never"},{v:"1x",id:"Sekitar 1× seminggu",en:"About once a week"},
+      {v:"2-3x",id:"2–3× seminggu",en:"2–3× a week"},{v:"4x",id:"4× seminggu atau lebih",en:"4× a week or more"}])}
+    <label>${lang==="id"?"Bisa berdiri dari kursi tanpa bantuan tangan?":"Can you stand from a chair without using your hands?"}</label>
+    ${f("kursi",[{v:"ya",id:"Ya, mudah",en:"Yes, easily"},{v:"susah",id:"Bisa, tapi berat",en:"Yes, but hard"},{v:"tidak",id:"Tidak bisa",en:"No"}])}
+    <label>${lang==="id"?"Bisa jalan 10 menit tanpa berhenti?":"Can you walk 10 minutes without stopping?"}</label>
+    ${f("jalan",[{v:"ya",id:"Ya",en:"Yes"},{v:"susah",id:"Bisa, tapi terengah",en:"Yes, but out of breath"},{v:"tidak",id:"Tidak bisa",en:"No"}])}
+   </div>`;},
+  simpan(){if(!state.jawab.frekuensi||!state.jawab.kursi||!state.jawab.jalan)
+    return lang==="id"?"Mohon jawab semua pertanyaan.":"Please answer every question.";}},
 
-  // 3 — sarana & waktu
-  { judul:{id:"Sarana & Waktu",en:"Equipment & Time"}, render(){
-      const alat = state.jawab.alat||[];
-      const daftarAlat = [
-        {v:"tidak_ada", id:"Tidak ada alat", en:"No equipment"},
-        {v:"kursi",     id:"Kursi & matras", en:"Chair & mat"},
-        {v:"dumbbell",  id:"Dumbbell tetap", en:"Fixed dumbbells"},
-        {v:"bar_plate", id:"Bar + plate", en:"Bar + plates"},
-        {v:"band",      id:"Resistance band", en:"Resistance band"}
-      ];
-      const f = (key, opsi) => `<div class="opts row" data-group="${key}">
-        ${opsi.map(o=>`<button class="opt ${state.jawab[key]==o.v?"on":""}" data-v="${o.v}">${o[lang]||o.id}</button>`).join("")}</div>`;
-      return `
-      <h1>${lang==="id"?"Sarana & Waktu":"Equipment & Time"}</h1>
-      <div class="card">
-        <label>${lang==="id"?"Alat yang Anda punya (boleh lebih dari satu)":"Equipment you have (multiple allowed)"}</label>
-        <div class="opts row" data-multi="alat">
-          ${daftarAlat.map(o=>`<button class="opt ${alat.includes(o.v)?"on":""}" data-v="${o.v}">${o[lang]||o.id}</button>`).join("")}
-        </div>
-        <label>${lang==="id"?"Hari per minggu yang realistis":"Realistic days per week"}</label>
-        ${f("hari",[{v:2,id:"2 hari",en:"2 days"},{v:3,id:"3 hari",en:"3 days"},{v:4,id:"4 hari",en:"4 days"}])}
-        <label>${lang==="id"?"Durasi per sesi":"Session length"}</label>
-        ${f("menit",[{v:15,id:"15 menit",en:"15 min"},{v:25,id:"25 menit",en:"25 min"},{v:40,id:"40 menit",en:"40 min"}])}
-        <label>${lang==="id"?"Waktu latihan":"Training time"}</label>
-        ${f("waktu",[
-          {v:"pagi",id:"Pagi",en:"Morning"},{v:"siang",id:"Siang",en:"Midday"},
-          {v:"sore",id:"Sore",en:"Afternoon"},{v:"malam",id:"Malam",en:"Evening"}])}
-      </div>`;
-    },
-    simpan(){
-      if(!state.jawab.hari||!state.jawab.menit)
-        return lang==="id"?"Mohon lengkapi hari & durasi.":"Please complete days & duration.";
-    }},
+ {render(){const alat=state.jawab.alat||[];
+   const da=[{v:"tidak_ada",id:"Tidak ada alat",en:"No equipment"},{v:"kursi",id:"Kursi & matras",en:"Chair & mat"},
+     {v:"dumbbell",id:"Dumbbell tetap",en:"Fixed dumbbells"},{v:"bar_plate",id:"Bar + plate",en:"Bar + plates"},
+     {v:"band",id:"Resistance band",en:"Resistance band"}];
+   const f=(k,o)=>`<div class="opts row" data-group="${k}">${o.map(x=>
+     `<button class="opt ${state.jawab[k]==x.v?"on":""}" data-v="${x.v}">${x[lang]||x.id}</button>`).join("")}</div>`;
+   return `<h1>${lang==="id"?"Sarana & Waktu":"Equipment & Time"}</h1>
+   <div class="card">
+    <label>${lang==="id"?"Alat yang Anda punya (boleh lebih dari satu)":"Equipment you have (multiple allowed)"}</label>
+    <div class="opts row" data-multi="alat">${da.map(o=>
+      `<button class="opt ${alat.includes(o.v)?"on":""}" data-v="${o.v}">${o[lang]||o.id}</button>`).join("")}</div>
+    <label>${lang==="id"?"Hari per minggu yang realistis":"Realistic days per week"}</label>
+    ${f("hari",[{v:2,id:"2 hari",en:"2 days"},{v:3,id:"3 hari",en:"3 days"},{v:4,id:"4 hari",en:"4 days"}])}
+    <label>${lang==="id"?"Durasi per sesi":"Session length"}</label>
+    ${f("menit",[{v:15,id:"15 menit",en:"15 min"},{v:25,id:"25 menit",en:"25 min"},{v:40,id:"40 menit",en:"40 min"}])}
+    <label>${lang==="id"?"Waktu latihan":"Training time"}</label>
+    ${f("waktu",[{v:"pagi",id:"Pagi",en:"Morning"},{v:"siang",id:"Siang",en:"Midday"},
+      {v:"sore",id:"Sore",en:"Afternoon"},{v:"malam",id:"Malam",en:"Evening"}])}
+   </div>`;},
+  simpan(){if(!state.jawab.hari||!state.jawab.menit)
+    return lang==="id"?"Mohon lengkapi hari & durasi.":"Please complete days & duration.";}},
 
-  // 4 — tujuan + persetujuan
-  { judul:{id:"Tujuan",en:"Goal"}, render(){
-      const opsi=[
-        {v:"turun_berat", id:"Turun berat badan", en:"Lose weight"},
-        {v:"kekuatan",    id:"Menambah kekuatan", en:"Get stronger"},
-        {v:"energi",      id:"Lebih bertenaga sehari-hari", en:"More daily energy"},
-        {v:"bentuk",      id:"Membentuk area tertentu", en:"Shape a specific area"},
-        {v:"sehat",       id:"Menjaga kesehatan & mobilitas", en:"Stay healthy & mobile"}];
-      return `
-      <h1>${lang==="id"?"Tujuan Utama":"Main Goal"}</h1>
-      <div class="card">
-        <div class="opts" data-group="tujuan">
-          ${opsi.map(o=>`<button class="opt ${state.jawab.tujuan===o.v?"on":""}" data-v="${o.v}">${o[lang]||o.id}</button>`).join("")}
-        </div>
-      </div>
-      <div class="card">
-        <h2>${lang==="id"?"Persetujuan":"Consent"}</h2>
-        <p class="faint">${lang==="id"
-          ? "Aplikasi ini memberikan panduan latihan umum dan <strong>bukan pengganti nasihat medis</strong>. Anda berlatih atas tanggung jawab sendiri. Hentikan latihan bila muncul nyeri tajam, pusing, atau nyeri dada, dan hubungi tenaga medis. Bila Anda punya kondisi kesehatan, konsultasikan ke dokter sebelum memulai."
-          : "This app provides general training guidance and is <strong>not a substitute for medical advice</strong>. You train at your own risk. Stop immediately if you feel sharp pain, dizziness or chest pain, and seek medical help. If you have a health condition, consult a doctor before starting."}</p>
-        <div class="row">
-          <div>${lang==="id"?"Saya sudah membaca dan menyetujui.":"I have read and agree."}</div>
-          <label class="sw"><input type="checkbox" id="f-setuju" ${state.jawab.setuju?"checked":""}><span></span></label>
-        </div>
-      </div>`;
-    },
-    simpan(){
-      state.jawab.setuju = document.getElementById("f-setuju").checked;
-      if(!state.jawab.tujuan) return lang==="id"?"Pilih tujuan utama.":"Pick a main goal.";
-      if(!state.jawab.setuju) return lang==="id"?"Persetujuan wajib dicentang untuk melanjutkan.":"You must agree to continue.";
-    }}
+ {render(){const o=[{v:"turun_berat",id:"Turun berat badan",en:"Lose weight"},
+    {v:"kekuatan",id:"Menambah kekuatan",en:"Get stronger"},{v:"energi",id:"Lebih bertenaga sehari-hari",en:"More daily energy"},
+    {v:"bentuk",id:"Membentuk area tertentu",en:"Shape a specific area"},{v:"sehat",id:"Menjaga kesehatan & mobilitas",en:"Stay healthy & mobile"}];
+   return `<h1>${lang==="id"?"Tujuan Utama":"Main Goal"}</h1>
+   <div class="card"><div class="opts" data-group="tujuan">${o.map(x=>
+     `<button class="opt ${state.jawab.tujuan===x.v?"on":""}" data-v="${x.v}">${x[lang]||x.id}</button>`).join("")}</div></div>
+   <div class="card"><h2>${lang==="id"?"Persetujuan":"Consent"}</h2>
+    <p class="faint">${lang==="id"
+      ?"Aplikasi ini memberikan panduan latihan umum dan <strong>bukan pengganti nasihat medis</strong>. Anda berlatih atas tanggung jawab sendiri. Hentikan latihan bila muncul nyeri tajam, pusing, atau nyeri dada, dan hubungi tenaga medis."
+      :"This app provides general training guidance and is <strong>not a substitute for medical advice</strong>. You train at your own risk. Stop if you feel sharp pain, dizziness or chest pain, and seek medical help."}</p>
+    <div class="row"><div>${lang==="id"?"Saya sudah membaca dan menyetujui.":"I have read and agree."}</div>
+     <label class="sw"><input type="checkbox" id="f-setuju" ${state.jawab.setuju?"checked":""}><span></span></label></div>
+   </div>`;},
+  simpan(){state.jawab.setuju=document.getElementById("f-setuju").checked;
+   if(!state.jawab.tujuan)return lang==="id"?"Pilih tujuan utama.":"Pick a main goal.";
+   if(!state.jawab.setuju)return lang==="id"?"Persetujuan wajib dicentang untuk melanjutkan.":"You must agree to continue.";}}
 ];
 
 function renderOnb(){
-  const L = LANGKAH[state.step];
-  if(!L) return;
-  document.getElementById("onb-step").innerHTML = L.render();
-  document.getElementById("onb-bar").style.width = ((state.step)/(LANGKAH.length-1)*100)+"%";
-  document.getElementById("onb-back").style.display = state.step===0 ? "none" : "";
-  document.getElementById("onb-next").textContent =
-    state.step===LANGKAH.length-1 ? (lang==="id"?"Selesai":"Finish") : t("lanjut");
-
-  // pilihan tunggal
-  document.querySelectorAll("[data-group]").forEach(g=>{
-    g.querySelectorAll(".opt").forEach(b=>b.addEventListener("click", ()=>{
-      const key = g.dataset.group;
-      state.jawab[key] = isNaN(b.dataset.v) ? b.dataset.v : Number(b.dataset.v);
-      g.querySelectorAll(".opt").forEach(x=>x.classList.remove("on"));
-      b.classList.add("on");
-    }));
-  });
-  // pilihan ganda
-  document.querySelectorAll("[data-multi]").forEach(g=>{
-    g.querySelectorAll(".opt").forEach(b=>b.addEventListener("click", ()=>{
-      const key = g.dataset.multi;
-      const arr = state.jawab[key] || [];
-      const v = b.dataset.v;
-      const i = arr.indexOf(v);
-      if (i>=0) arr.splice(i,1); else arr.push(v);
-      state.jawab[key]=arr; b.classList.toggle("on");
-    }));
-  });
-  // ya/tidak skrining
-  document.querySelectorAll(".yn").forEach(g=>{
-    g.querySelectorAll("button").forEach(b=>b.addEventListener("click", ()=>{
-      state.jawab["s_"+g.dataset.q] = b.dataset.v==="ya";
-      g.querySelectorAll("button").forEach(x=>x.className="");
-      b.className = b.dataset.v==="ya" ? "on-yes" : "on-no";
-    }));
-  });
+  const S=LANGKAH[state.step]; if(!S)return;
+  document.getElementById("onb-step").innerHTML=S.render();
+  document.getElementById("onb-bar").style.width=(state.step/(LANGKAH.length-1)*100)+"%";
+  document.getElementById("onb-back").style.display=state.step===0?"none":"";
+  document.getElementById("onb-next").textContent=state.step===LANGKAH.length-1?(lang==="id"?"Selesai":"Finish"):t("lanjut");
+  document.querySelectorAll("[data-group]").forEach(g=>g.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
+    state.jawab[g.dataset.group]=isNaN(b.dataset.v)?b.dataset.v:Number(b.dataset.v);
+    g.querySelectorAll(".opt").forEach(x=>x.classList.remove("on")); b.classList.add("on");}));
+  document.querySelectorAll("[data-multi]").forEach(g=>g.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
+    const k=g.dataset.multi, a=state.jawab[k]||[], i=a.indexOf(b.dataset.v);
+    if(i>=0)a.splice(i,1);else a.push(b.dataset.v); state.jawab[k]=a; b.classList.toggle("on");}));
+  document.querySelectorAll(".yn").forEach(g=>g.querySelectorAll("button").forEach(b=>b.onclick=()=>{
+    state.jawab["s_"+g.dataset.q]=b.dataset.v==="ya";
+    g.querySelectorAll("button").forEach(x=>x.className="");
+    b.className=b.dataset.v==="ya"?"on-yes":"on-no";}));
+}
+document.getElementById("onb-back").onclick=()=>{if(state.step>0){state.step--;pesan("onb-msg","");renderOnb();}};
+document.getElementById("onb-next").onclick=async()=>{
+  const err=LANGKAH[state.step].simpan();
+  if(err==="__HAMIL__"){pesan("onb-msg",lang==="id"
+    ?"<strong>Program umum tidak diberikan untuk kondisi ini.</strong> Latihan saat hamil atau pascamelahirkan memerlukan program khusus dari bidan, dokter, atau fisioterapis yang memeriksa Anda langsung."
+    :"<strong>A general program is not provided for this condition.</strong> Training during pregnancy or postpartum needs a specific program from a midwife, doctor or physiotherapist who has examined you.","warn");return;}
+  if(err){pesan("onb-msg",err);return;}
+  pesan("onb-msg","");
+  if(state.step<LANGKAH.length-1){state.step++;renderOnb();return;}
+  const b=document.getElementById("onb-next"); b.disabled=true;
+  try{ await selesaiOnb(); }catch(e){}finally{b.disabled=false;}
+};
+function hitungLevel(){
+  const j=state.jawab, merah=SKRINING.some(q=>j["s_"+q.k]===true);
+  let s=0;
+  s+={tidak:0,"1x":1,"2-3x":2,"4x":3}[j.frekuensi]??0;
+  s+={ya:2,susah:1,tidak:0}[j.kursi]??0;
+  s+={ya:2,susah:1,tidak:0}[j.jalan]??0;
+  if(j.usia!==null&&j.usia>=60)s-=2;
+  let level=s>=6?"pro":s>=3?"medium":"easy";
+  if(merah&&level==="pro")level="medium";
+  if(j.frekuensi==="tidak")level="easy";
+  if(j.usia!==null&&j.usia>=60&&level==="pro")level="medium";
+  return {level,merah};
+}
+async function selesaiOnb(){
+  const {level,merah}=hitungLevel(), j=state.jawab, jw={};
+  SKRINING.forEach(q=>{if(j["s_"+q.k]!==undefined)jw[q.k]=j["s_"+q.k];});
+  const {error:e1}=await sb.from("health_screening").insert({
+    user_id:state.user.id,jawaban:jw,ada_flag_merah:merah,disetujui_pengguna:true,versi_disclaimer:"v1-2026-09"});
+  if(e1){pesan("onb-msg",(lang==="id"?"Gagal menyimpan skrining: ":"Failed to save screening: ")+e1.message);throw e1;}
+  const patch={gender:j.gender,tanggal_lahir:j.tanggal_lahir,tinggi_cm:j.tinggi_cm,level,
+    alat_dimiliki:j.alat||[],hari_per_minggu:j.hari,menit_per_sesi:j.menit,waktu_latihan:j.waktu,
+    tujuan_utama:j.tujuan,bahasa:lang,onboarding_selesai:true,updated_at:new Date().toISOString()};
+  const {error:e2}=await sb.from("profiles").upsert(Object.assign({id:state.user.id},patch));
+  if(e2){pesan("onb-msg",(lang==="id"?"Gagal menyimpan profil: ":"Failed to save profile: ")+e2.message);throw e2;}
+  state.profil=Object.assign(state.profil||{},patch);
+  if(merah) alert(lang==="id"
+    ?"Ada jawaban yang menandakan risiko kesehatan. Sebaiknya konsultasikan ke dokter sebelum memulai, dan mulailah dari level paling ringan."
+    :"Some answers indicate a health risk. Please consult a doctor before starting, and begin at the lightest level.");
+  await bukaApp();
 }
 
-document.getElementById("onb-back").onclick = ()=>{ if(state.step>0){ state.step--; pesan("onb-msg",""); renderOnb(); } };
-document.getElementById("onb-next").onclick = async ()=>{
-  const err = LANGKAH[state.step].simpan();
-  if (err === "__HAMIL__"){
-    pesan("onb-msg", lang==="id"
-      ? "<strong>Program umum tidak diberikan untuk kondisi ini.</strong> Latihan saat hamil atau pascamelahirkan memerlukan program khusus dari bidan, dokter, atau fisioterapis yang memeriksa Anda langsung. Silakan gunakan aplikasi ini lagi setelah mendapat izin dari mereka."
-      : "<strong>A general program is not provided for this condition.</strong> Training during pregnancy or postpartum needs a specific program from a midwife, doctor or physiotherapist who has examined you. Please return once they have cleared you.", "warn");
-    return;
+// =====================================================================
+// MUAT DATA HARI INI
+// =====================================================================
+async function pastikanProgram(){
+  let {data}=await sb.from("user_programs").select("*").eq("status","aktif").limit(1);
+  if(data&&data[0]){ state.mulai=data[0].tanggal_mulai; state.programRow=data[0]; return; }
+  const row={id:crypto.randomUUID(),user_id:state.user.id,tanggal_mulai:fmt(new Date()),status:"aktif"};
+  await sb.from("user_programs").insert(row);
+  state.mulai=row.tanggal_mulai; state.programRow=row;
+}
+async function muatHari(){
+  const tgl=state.tanggal;
+  try{
+    const [dl,ws,ml,hb,bm]=await Promise.all([
+      sb.from("daily_logs").select("*").eq("tanggal",tgl).maybeSingle(),
+      sb.from("workout_sessions").select("*").eq("tanggal",tgl).maybeSingle(),
+      sb.from("meals").select("*").eq("tanggal",tgl).order("jam"),
+      sb.from("habit_logs").select("*").eq("tanggal",tgl),
+      sb.from("body_metrics").select("*").eq("tanggal",tgl).maybeSingle()
+    ]);
+    state.hari=dl.data||{};
+    state.sesi=ws.data||null;
+    state.makan=ml.data||[];
+    state.kebiasaan=hb.data||[];
+    state.ukuran=bm.data||{};
+    if(state.sesi){
+      const {data:st}=await sb.from("session_sets").select("*").eq("session_id",state.sesi.id);
+      state.sets=st||[];
+    } else state.sets=[];
+    await cacheSet("hari:"+tgl,{hari:state.hari,sesi:state.sesi,sets:state.sets,
+      makan:state.makan,kebiasaan:state.kebiasaan,ukuran:state.ukuran});
+  }catch(e){
+    const c=await cacheGet("hari:"+tgl);
+    if(c){state.hari=c.hari;state.sesi=c.sesi;state.sets=c.sets;
+          state.makan=c.makan;state.kebiasaan=c.kebiasaan;state.ukuran=c.ukuran;}
   }
-  if (err){ pesan("onb-msg", err); return; }
-  pesan("onb-msg","");
+}
 
-  if (state.step < LANGKAH.length-1){ state.step++; renderOnb(); return; }
-  const btn = document.getElementById("onb-next");
-  btn.disabled = true;
-  try { await selesaikanOnboarding(); }
-  catch(e){ /* pesan sudah ditampilkan */ }
-  finally { btn.disabled = false; }
+// =====================================================================
+// HARI INI
+// =====================================================================
+function daftarGerak(){
+  const lvl=state.profil.level||"easy";
+  const tipe=jadwalHari(new Date().getDay(), state.profil.hari_per_minggu||3);
+  if(tipe!=="A"&&tipe!=="B") return null;
+  return {tipe, list:(PROGRAM[lvl]||PROGRAM.easy)[tipe]};
+}
+function setKey(ex,i){ return state.sets.find(s=>s.exercise_id===ex&&s.set_ke===i); }
+
+async function pastikanSesi(label){
+  if(state.sesi) return state.sesi;
+  const row={id:crypto.randomUUID(),user_id:state.user.id,tanggal:state.tanggal,label,selesai:false};
+  state.sesi=row;
+  await simpan("workout_sessions",row);
+  return row;
+}
+
+function renderToday(){
+  if(!state.siap) return;
+  const now=new Date(), mg=mingguKe(state.mulai,now), tipe=jadwalHari(now.getDay(),state.profil.hari_per_minggu||3);
+  const fase=mg<=2?1:mg<=4?2:mg<=8?3:4;
+  document.getElementById("t-week").textContent=
+    (lang==="id"?`Minggu ${mg} · Fase ${fase}`:`Week ${mg} · Phase ${fase}`);
+  document.getElementById("t-day").textContent=
+    HARI[lang][now.getDay()]+", "+now.getDate()+" "+BULAN[now.getMonth()];
+  const tg=targetLangkah(mg);
+  document.getElementById("t-chips").innerHTML=
+    `<span class="chip">${({easy:"Easy",medium:"Medium",pro:"Pro"})[state.profil.level]||"Easy"}</span>`+
+    `<span class="chip g">${t("target").replace("%n",tg.toLocaleString("id-ID"))}</span>`;
+  document.getElementById("langkah-sub").textContent=t("target").replace("%n",tg.toLocaleString("id-ID"));
+
+  const g=daftarGerak();
+  document.getElementById("c-workout").style.display=g?"":"none";
+  document.getElementById("c-light").style.display=g?"none":"";
+  if(g){
+    document.getElementById("w-title").textContent=(lang==="id"?"Latihan ":"Workout ")+g.tipe;
+    const box=document.getElementById("w-list"); box.innerHTML="";
+    g.list.forEach(([ex,setn,rep])=>{
+      const info=GERAK[ex]; const d=document.createElement("div"); d.className="ex";
+      let dots="";
+      for(let i=1;i<=setn;i++){const s=setKey(ex,i);
+        dots+=`<div class="dot ${s&&s.selesai?"on":""}" data-ex="${ex}" data-set="${i}">${s&&s.selesai?"✓":i}</div>`;}
+      const beban=(setKey(ex,1)||{}).beban_kg ?? info.kg ?? "";
+      d.innerHTML=`<div class="exh"><div class="exn">${L(info.n)}</div><div class="ext">${setn}×${rep}</div></div>
+        <div class="exr">${info.bw?`<span class="ext">${t("tanpa_beban")}</span>`
+          :`<input type="number" step="0.5" class="mini" style="width:74px" data-beban="${ex}" value="${beban}"><span class="ext">${t("kg_tangan")}</span>`}
+        <div class="dots">${dots}</div></div>
+        <button class="info" data-info="${ex}">${lang==="id"?"Lihat cara melakukan →":"See how to do it →"}</button>`;
+      box.appendChild(d);
+    });
+    box.querySelectorAll(".dot").forEach(el=>el.onclick=async()=>{
+      const ex=el.dataset.ex, i=+el.dataset.set;
+      const sesi=await pastikanSesi("Latihan "+g.tipe);
+      let s=setKey(ex,i);
+      const bebanEl=box.querySelector(`[data-beban="${ex}"]`);
+      const beban=bebanEl?parseFloat(bebanEl.value)||null:null;
+      if(!s){ s={id:crypto.randomUUID(),session_id:sesi.id,user_id:state.user.id,
+                 exercise_id:ex,set_ke:i,beban_kg:beban,selesai:true}; state.sets.push(s); }
+      else s.selesai=!s.selesai;
+      await simpan("session_sets",s);
+      renderToday(); simpanStatus();
+    });
+    box.querySelectorAll("[data-beban]").forEach(el=>el.onchange=async()=>{
+      const ex=el.dataset.beban, v=parseFloat(el.value)||null;
+      const sesi=await pastikanSesi("Latihan "+g.tipe);
+      for(const s of state.sets.filter(x=>x.exercise_id===ex)){ s.beban_kg=v; await simpan("session_sets",s); }
+      if(!state.sets.some(x=>x.exercise_id===ex)){
+        const s={id:crypto.randomUUID(),session_id:sesi.id,user_id:state.user.id,
+                 exercise_id:ex,set_ke:1,beban_kg:v,selesai:false};
+        state.sets.push(s); await simpan("session_sets",s);
+      }
+    });
+    box.querySelectorAll("[data-info]").forEach(el=>el.onclick=()=>bukaInfo(el.dataset.info));
+    const semua=g.list.every(([ex,n])=>{let c=0;for(let i=1;i<=n;i++){const s=setKey(ex,i);if(s&&s.selesai)c++;}return c>=n;});
+    const b=document.getElementById("w-done");
+    const done=(state.sesi&&state.sesi.selesai)||semua;
+    b.textContent=done?t("latihan_selesai"):t("tandai");
+    b.classList.toggle("done",done);
+  } else {
+    document.getElementById("light-lbl").textContent=
+      tipe==="rest"?t("istirahat"):tipe==="cardio"?t("cardio"):t("jalan_santai");
+    const tick=document.getElementById("light-tick");
+    tick.classList.toggle("on", !!(state.sesi&&state.sesi.selesai));
+    tick.onclick=async()=>{
+      const sesi=await pastikanSesi(tipe);
+      sesi.selesai=!sesi.selesai; await simpan("workout_sessions",sesi);
+      renderToday(); simpanStatus();
+    };
+  }
+
+  document.getElementById("i-langkah").value=state.hari.langkah??"";
+  document.getElementById("i-tidur").value=state.hari.tidur_mulai?state.hari.tidur_mulai.slice(0,5):"";
+  document.getElementById("i-bangun").value=state.hari.tidur_selesai?state.hari.tidur_selesai.slice(0,5):"";
+  document.getElementById("i-bangunmalam").checked=!!state.hari.terbangun_malam;
+  hitungTidur(false);
+
+  // makan
+  const ml=document.getElementById("meal-list"); ml.innerHTML="";
+  if(!state.makan.length) ml.innerHTML=`<div class="faint">${t("belum_makan")}</div>`;
+  state.makan.forEach(m=>{
+    const r=document.createElement("div"); r.className="row";
+    r.innerHTML=`<div><div class="t">${(m.jam||"").slice(0,5)} · ${m.deskripsi||""}</div>
+      <div class="faint">${t("porsi_"+(m.porsi||"normal"))} · ≈${m.perkiraan_kkal||0} kkal</div></div>
+      <button class="small" data-del="${m.id}" style="color:var(--bad)">${t("hapus")}</button>`;
+    ml.appendChild(r);
+  });
+  ml.querySelectorAll("[data-del]").forEach(b=>b.onclick=async()=>{
+    const id=b.dataset.del;
+    await sb.from("meals").delete().eq("id",id);
+    state.makan=state.makan.filter(x=>x.id!==id); renderToday(); simpanStatus();
+  });
+  const pz=document.getElementById("m-porsi");
+  if(!pz.dataset.init){
+    pz.dataset.init="1";
+    ["kecil","sedang","normal","banyak"].forEach(p=>{
+      const b=document.createElement("button"); b.className="opt"+(p==="normal"?" on":""); b.dataset.porsi=p;
+      b.onclick=()=>{pz.querySelectorAll(".opt").forEach(x=>x.classList.remove("on"));b.classList.add("on");};
+      pz.appendChild(b);
+    });
+  }
+  pz.querySelectorAll(".opt").forEach(b=>b.textContent=t("porsi_"+b.dataset.porsi));
+
+  // kebiasaan opsional
+  const hOn=localStorage.getItem("habit_on")==="1";
+  document.getElementById("c-habit").style.display=hOn?"":"none";
+  if(hOn){
+    const list=(localStorage.getItem("habit_list")||"rokok,alkohol").split(",").map(s=>s.trim()).filter(Boolean);
+    const hb=document.getElementById("habit-list"); hb.innerHTML="";
+    list.forEach(tipe=>{
+      const rec=state.kebiasaan.find(x=>x.tipe===tipe)||{jumlah:0};
+      const r=document.createElement("div"); r.className="row";
+      r.innerHTML=`<div class="t">${tipe}</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="small" data-h="${tipe}" data-d="-1">–</button>
+          <strong style="min-width:34px;text-align:center">${rec.jumlah||0}</strong>
+          <button class="small" data-h="${tipe}" data-d="1">+</button></div>`;
+      hb.appendChild(r);
+    });
+    hb.querySelectorAll("[data-h]").forEach(b=>b.onclick=async()=>{
+      const tipe=b.dataset.h, d=+b.dataset.d;
+      let rec=state.kebiasaan.find(x=>x.tipe===tipe);
+      if(!rec){rec={id:crypto.randomUUID(),user_id:state.user.id,tanggal:state.tanggal,tipe,jumlah:0,satuan:"unit"};
+               state.kebiasaan.push(rec);}
+      rec.jumlah=Math.max(0,(rec.jumlah||0)+d);
+      await simpan("habit_logs",rec); renderToday();
+    });
+  }
+}
+
+function hitungTidur(simpanJuga=true){
+  const a=document.getElementById("i-tidur").value, b=document.getElementById("i-bangun").value;
+  const el=document.getElementById("tidur-durasi");
+  if(a&&b){
+    const [h1,m1]=a.split(":").map(Number),[h2,m2]=b.split(":").map(Number);
+    let d=(h2*60+m2)-(h1*60+m1); if(d<=0)d+=1440;
+    const jam=d/60; el.textContent=jam.toFixed(1)+(lang==="id"?" jam":" h");
+    el.className="chip "+(jam>=7?"g":"n");
+    state.hari.tidur_jam=Number(jam.toFixed(1));
+  } else { el.textContent="—"; el.className="chip n"; state.hari.tidur_jam=null; }
+  if(simpanJuga) simpanHari();
+}
+async function simpanHari(){
+  const row=Object.assign({},state.hari,{
+    id:state.hari.id||crypto.randomUUID(), user_id:state.user.id, tanggal:state.tanggal});
+  state.hari=row;
+  await simpan("daily_logs",row,"user_id,tanggal");
+  simpanStatus();
+}
+async function simpanStatus(){
+  const mg=mingguKe(state.mulai,new Date());
+  const g=daftarGerak();
+  let latihan=false;
+  if(g&&state.sets.length){
+    latihan=g.list.every(([ex,n])=>{let c=0;for(let i=1;i<=n;i++){const s=setKey(ex,i);if(s&&s.selesai)c++;}return c>=n;});
+  }
+  if(state.sesi&&state.sesi.selesai) latihan=true;
+  const row={id:(state.status&&state.status.id)||crypto.randomUUID(),user_id:state.user.id,tanggal:state.tanggal,
+    latihan_selesai:latihan, makan_tercatat:state.makan.length>0,
+    langkah_target_capai:(state.hari.langkah||0)>=targetLangkah(mg)};
+  state.status=row;
+  await simpan("daily_status",row,"user_id,tanggal");
+}
+
+document.getElementById("i-langkah").onchange=e=>{
+  state.hari.langkah=e.target.value===""?null:parseInt(e.target.value,10); simpanHari();};
+document.getElementById("i-tidur").onchange=e=>{state.hari.tidur_mulai=e.target.value||null;hitungTidur();};
+document.getElementById("i-bangun").onchange=e=>{state.hari.tidur_selesai=e.target.value||null;hitungTidur();};
+document.getElementById("i-bangunmalam").onchange=e=>{state.hari.terbangun_malam=e.target.checked;simpanHari();};
+
+document.getElementById("w-done").onclick=async()=>{
+  const g=daftarGerak(); if(!g)return;
+  const sesi=await pastikanSesi("Latihan "+g.tipe);
+  sesi.selesai=!sesi.selesai; await simpan("workout_sessions",sesi);
+  renderToday(); simpanStatus();
 };
 
-function hitungLevel(){
-  const j = state.jawab;
-  const merah = SKRINING.some(q=>j["s_"+q.k]===true);
-  let skor = 0;
-  skor += {tidak:0,"1x":1,"2-3x":2,"4x":3}[j.frekuensi] ?? 0;
-  skor += {ya:2,susah:1,tidak:0}[j.kursi] ?? 0;
-  skor += {ya:2,susah:1,tidak:0}[j.jalan] ?? 0;
-  if (j.usia !== null && j.usia >= 60) skor -= 2;
-  let level = skor >= 6 ? "pro" : skor >= 3 ? "medium" : "easy";
-  // Aturan keras: flag merah atau belum pernah olahraga → tidak boleh mulai di PRO
-  if (merah && level === "pro") level = "medium";
-  if (j.frekuensi === "tidak") level = "easy";
-  if (j.usia !== null && j.usia >= 60 && level === "pro") level = "medium";
-  return { level, merah };
+const KKAL={kecil:300,sedang:450,normal:600,banyak:800};
+document.getElementById("m-add").onclick=async()=>{
+  const jam=document.getElementById("m-jam").value||null;
+  const desc=document.getElementById("m-desc").value.trim();
+  if(!desc){document.getElementById("m-desc").focus();return;}
+  const porsi=(document.querySelector("#m-porsi .opt.on")||{dataset:{porsi:"normal"}}).dataset.porsi;
+  const row={id:crypto.randomUUID(),user_id:state.user.id,tanggal:state.tanggal,
+             jam,deskripsi:desc,porsi,perkiraan_kkal:KKAL[porsi]};
+  state.makan.push(row);
+  await simpan("meals",row);
+  document.getElementById("m-desc").value="";
+  renderToday(); simpanStatus();
+};
+
+// popup cara melakukan
+async function bukaInfo(exId){
+  const sheet=document.getElementById("sheet");
+  const info=GERAK[exId];
+  sheet.innerHTML=`<h3>${L(info.n)}</h3><div class="faint">${lang==="id"?"Memuat…":"Loading…"}</div>`;
+  document.getElementById("modal").classList.add("on");
+  let ex=null;
+  try{ const {data}=await sb.from("exercises").select("*").eq("id",exId).maybeSingle(); ex=data; }catch(e){}
+  if(!ex){ sheet.innerHTML=`<h3>${L(info.n)}</h3>
+    <p class="faint">${lang==="id"?"Detail gerakan belum tersedia offline.":"Exercise detail not available offline."}</p>
+    <button class="btn ghost" onclick="document.getElementById('modal').classList.remove('on')">${t("tutup")}</button>`; return; }
+  const langkah=(ex.cara_melakukan&&(ex.cara_melakukan[lang]||ex.cara_melakukan.id))||[];
+  sheet.innerHTML=`<h3>${L(ex.nama)}</h3>
+    <h2 style="margin-top:14px">${t("cara")}</h2><ol>${langkah.map(s=>`<li>${s}</li>`).join("")}</ol>
+    <h2 style="margin-top:14px">${t("salah")}</h2><p style="font-size:14px">${L(ex.kesalahan_umum)}</p>
+    <h2 style="margin-top:14px">${t("kenapa")}</h2><p style="font-size:14px">${L(ex.kenapa_penting)}</p>
+    <h2 style="margin-top:14px">${t("otot_utama")}</h2>
+    <p style="font-size:14px">${(ex.otot_primer||[]).join(", ")}</p>
+    ${(ex.otot_sekunder||[]).length?`<h2 style="margin-top:12px">${t("otot_pendukung")}</h2>
+      <p style="font-size:14px;color:var(--dim)">${ex.otot_sekunder.join(", ")}</p>`:""}
+    <button class="btn ghost" id="tutup-sheet">${t("tutup")}</button>`;
+  document.getElementById("tutup-sheet").onclick=()=>document.getElementById("modal").classList.remove("on");
 }
-
-async function selesaikanOnboarding(){
-  const { level, merah } = hitungLevel();
-  const j = state.jawab;
-  const jawabanSkrining = {};
-  SKRINING.forEach(q=>{ if(j["s_"+q.k]!==undefined) jawabanSkrining[q.k]=j["s_"+q.k]; });
-
-  const { error: errSkrining } = await sb.from("health_screening").insert({
-    user_id: state.user.id,
-    jawaban: jawabanSkrining,
-    ada_flag_merah: merah,
-    disetujui_pengguna: true,
-    versi_disclaimer: "v1-2026-09"
-  });
-  if (errSkrining){
-    pesan("onb-msg", (lang==="id"
-      ? "Gagal menyimpan skrining: " : "Failed to save screening: ") + errSkrining.message);
-    throw errSkrining;
-  }
-
-  const patch = {
-    gender: j.gender, tanggal_lahir: j.tanggal_lahir, tinggi_cm: j.tinggi_cm,
-    level, alat_dimiliki: j.alat||[], hari_per_minggu: j.hari, menit_per_sesi: j.menit,
-    waktu_latihan: j.waktu, tujuan_utama: j.tujuan, bahasa: lang,
-    onboarding_selesai: true, updated_at: new Date().toISOString()
-  };
-  const { error: errProfil } = await sb.from("profiles")
-    .upsert(Object.assign({ id: state.user.id }, patch));
-  if (errProfil){
-    pesan("onb-msg", (lang==="id"
-      ? "Gagal menyimpan profil: " : "Failed to save profile: ") + errProfil.message);
-    throw errProfil;
-  }
-  state.profil = Object.assign(state.profil||{}, patch);
-
-  if (merah){
-    alert(lang==="id"
-      ? "Ada jawaban yang menandakan risiko kesehatan. Sebaiknya konsultasikan ke dokter sebelum memulai, dan mulailah dari level paling ringan. Hentikan latihan bila muncul nyeri dada, pusing, atau nyeri tajam."
-      : "Some answers indicate a health risk. Please consult a doctor before starting, and begin at the lightest level. Stop training if you feel chest pain, dizziness, or sharp pain.");
-  }
-  await bukaHome();
-}
+document.getElementById("modal").onclick=e=>{ if(e.target.id==="modal") e.currentTarget.classList.remove("on"); };
 
 // =====================================================================
-// BERANDA
+// PROGRES
 // =====================================================================
-async function bukaHome(){
-  const p = state.profil||{};
-  document.getElementById("home-hi").textContent =
-    (lang==="id"?"Halo, ":"Hi, ") + (p.nama || (state.user.email||"").split("@")[0]);
-  document.getElementById("home-sub").textContent =
-    lang==="id" ? "Fondasi aplikasi sudah aktif." : "App foundation is live.";
-  document.getElementById("h-level").textContent =
-    ({easy:"Easy",medium:"Medium",pro:"Pro"})[p.level] || "—";
+async function renderProg(){
+  if(!state.siap) return;
+  const u=state.ukuran||{};
+  const set=(id,v)=>{const e=document.getElementById(id); if(e) e.value=v??"";};
+  set("i-berat",u.berat_kg); set("i-perut",u.lingkar_perut); set("i-pinggang",u.lingkar_pinggang);
+  set("i-pinggul",u.lingkar_pinggul); set("i-lengan",u.lingkar_lengan); set("i-paha",u.lingkar_paha);
 
-  document.getElementById("sw-grup").checked = !!p.izin_grup_status;
-  document.getElementById("sw-adm1").checked = !!p.izin_admin_ringkasan;
-  document.getElementById("sw-adm2").checked = !!p.izin_admin_detail;
-
+  let metrics=[],logs=[],sesi=[];
   try{
-    const { data } = await sb.from("memberships")
-      .select("group_id, token_groups(nama_group, berakhir_pada)").limit(1);
-    const g = data && data[0] && data[0].token_groups;
-    if (g){
-      document.getElementById("h-grup").textContent = g.nama_group;
-      document.getElementById("h-berlaku").textContent = g.berakhir_pada
-        ? new Date(g.berakhir_pada).toLocaleDateString(lang==="id"?"id-ID":"en-GB")
-        : (lang==="id"?"Tanpa batas":"Unlimited");
-      await cacheSet("grup", g);
-    }
-  }catch(e){
-    const g = await cacheGet("grup");
-    if (g) document.getElementById("h-grup").textContent = g.nama_group;
+    const [m,l,s]=await Promise.all([
+      sb.from("body_metrics").select("*").order("tanggal",{ascending:true}).limit(60),
+      sb.from("daily_logs").select("*").order("tanggal",{ascending:false}).limit(30),
+      sb.from("workout_sessions").select("*").order("tanggal",{ascending:false}).limit(40)
+    ]);
+    metrics=m.data||[]; logs=l.data||[]; sesi=s.data||[];
+    await cacheSet("prog",{metrics,logs,sesi});
+  }catch(e){ const c=await cacheGet("prog"); if(c){metrics=c.metrics;logs=c.logs;sesi=c.sesi;} }
+
+  // tren berat
+  const w=metrics.filter(x=>x.berat_kg!=null);
+  const svg=document.getElementById("trend"); svg.innerHTML="";
+  document.getElementById("trend-empty").style.display=w.length>=2?"none":"";
+  if(w.length>=2){
+    const v=w.map(x=>x.berat_kg); let mn=Math.min(...v),mx=Math.max(...v);
+    if(mn===mx){mn-=1;mx+=1;}
+    const W=300,H=92,p=9;
+    const pts=v.map((val,i)=>{
+      const x=p+(i/(v.length-1))*(W-2*p), y=H-p-((val-mn)/(mx-mn))*(H-2*p);
+      return x.toFixed(1)+","+y.toFixed(1);}).join(" ");
+    const ns="http://www.w3.org/2000/svg";
+    const pl=document.createElementNS(ns,"polyline");
+    pl.setAttribute("points",pts); pl.setAttribute("fill","none");
+    pl.setAttribute("stroke","var(--accent)"); pl.setAttribute("stroke-width","2");
+    pl.setAttribute("stroke-linejoin","round"); svg.appendChild(pl);
   }
-  show("v-home");
+
+  // statistik minggu ini
+  const sen=fmt(senin(new Date())), ming=fmt(addH(senin(new Date()),6));
+  const inWeek=a=>a.tanggal>=sen&&a.tanggal<=ming;
+  const sesiMg=sesi.filter(x=>inWeek(x)&&x.selesai).length;
+  const lgMg=logs.filter(x=>inWeek(x)&&x.langkah!=null);
+  const tdMg=logs.filter(x=>inWeek(x)&&x.tidur_jam!=null);
+  document.getElementById("s-latihan").textContent=sesiMg;
+  document.getElementById("s-langkah").textContent=lgMg.length
+    ? Math.round(lgMg.reduce((a,b)=>a+b.langkah,0)/lgMg.length).toLocaleString("id-ID") : "—";
+  document.getElementById("s-tidur").textContent=tdMg.length
+    ? (tdMg.reduce((a,b)=>a+Number(b.tidur_jam),0)/tdMg.length).toFixed(1) : "—";
+
+  // riwayat
+  const byDate={};
+  logs.forEach(l=>{byDate[l.tanggal]=Object.assign(byDate[l.tanggal]||{},{log:l});});
+  metrics.forEach(m=>{byDate[m.tanggal]=Object.assign(byDate[m.tanggal]||{},{m});});
+  const tgls=Object.keys(byDate).sort().reverse().slice(0,20);
+  const tb=document.getElementById("hist"); tb.innerHTML="";
+  document.getElementById("hist-empty").style.display=tgls.length?"none":"";
+  tgls.forEach(d=>{
+    const x=byDate[d], l=x.log||{}, m=x.m||{};
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td>${d.slice(5)}</td><td class="num">${m.berat_kg??"—"}</td>
+      <td class="num">${m.lingkar_perut??"—"}</td><td class="num">${l.langkah??"—"}</td>
+      <td class="num">${l.tidur_jam??"—"}</td>`;
+    tb.appendChild(tr);
+  });
+  state._data={metrics,logs,sesi};
+}
+async function simpanUkuran(){
+  const num=id=>{const v=document.getElementById(id).value; return v===""?null:parseFloat(v);};
+  const row=Object.assign({},state.ukuran,{
+    id:(state.ukuran&&state.ukuran.id)||crypto.randomUUID(), user_id:state.user.id, tanggal:state.tanggal,
+    berat_kg:num("i-berat"), lingkar_perut:num("i-perut"), lingkar_pinggang:num("i-pinggang"),
+    lingkar_pinggul:num("i-pinggul"), lingkar_lengan:num("i-lengan"), lingkar_paha:num("i-paha")});
+  state.ukuran=row;
+  await simpan("body_metrics",row,"user_id,tanggal");
+}
+["i-berat","i-perut","i-pinggang","i-pinggul","i-lengan","i-paha"].forEach(id=>{
+  const el=document.getElementById(id); if(el) el.onchange=simpanUkuran;});
+document.getElementById("toggle-ukuran").onclick=()=>{
+  const b=document.getElementById("ukuran-lain");
+  b.style.display=b.style.display==="none"?"":"none";};
+
+document.getElementById("btn-salin").onclick=async()=>{
+  const teks=await buatRingkasan();
+  const ta=document.getElementById("ringkasan"); ta.value=teks; ta.style.display="block";
+  const b=document.getElementById("btn-salin");
+  try{ await navigator.clipboard.writeText(teks); b.textContent=t("tersalin");
+       setTimeout(()=>b.textContent=t("salin"),2500);
+  }catch(e){ ta.focus(); ta.select(); }
+};
+async function buatRingkasan(){
+  const d=state._data||{metrics:[],logs:[],sesi:[]};
+  const sen=senin(new Date()), out=[];
+  out.push(`RINGKASAN MINGGU (${fmt(sen)} s/d ${fmt(addH(sen,6))})`);
+  out.push(`Level: ${state.profil.level} · Minggu ke-${mingguKe(state.mulai,new Date())} dari 12`);
+  for(let i=0;i<7;i++){
+    const day=addH(sen,i), tg=fmt(day);
+    if(day>new Date()) continue;
+    const l=d.logs.find(x=>x.tanggal===tg)||{};
+    const s=d.sesi.find(x=>x.tanggal===tg);
+    const m=d.metrics.find(x=>x.tanggal===tg)||{};
+    out.push("");
+    out.push(HARI.id[day.getDay()]+" "+day.getDate()+" "+BULAN[day.getMonth()]);
+    if(s) out.push(`- ${s.label||"Latihan"}: ${s.selesai?"selesai":"sebagian"}`);
+    if(l.langkah!=null) out.push(`- Langkah: ${l.langkah}`);
+    if(l.tidur_jam!=null) out.push(`- Tidur: ${l.tidur_mulai||"?"}-${l.tidur_selesai||"?"} (${l.tidur_jam} jam)${l.terbangun_malam?" | terbangun tengah malam":""}`);
+    if(m.berat_kg!=null) out.push(`- Berat: ${m.berat_kg} kg`);
+    if(m.lingkar_perut!=null) out.push(`- Lingkar perut: ${m.lingkar_perut} cm`);
+  }
+  try{
+    const {data:mk}=await sb.from("meals").select("*")
+      .gte("tanggal",fmt(sen)).lte("tanggal",fmt(addH(sen,6))).order("tanggal").order("jam");
+    if(mk&&mk.length){
+      out.push(""); out.push("MAKAN");
+      const grup={}; mk.forEach(m=>{(grup[m.tanggal]=grup[m.tanggal]||[]).push(m);});
+      Object.keys(grup).sort().forEach(tg=>{
+        const arr=grup[tg], jam=arr.map(a=>(a.jam||"").slice(0,5)).filter(Boolean).sort();
+        out.push(`${tg}: ${arr.map(a=>`${(a.jam||"").slice(0,5)} ${a.deskripsi} (${a.porsi}, ≈${a.perkiraan_kkal}kkal)`).join("; ")}`);
+        if(jam.length) out.push(`  jam makan pertama ${jam[0]} · terakhir ${jam[jam.length-1]}`);
+      });
+    }
+  }catch(e){}
+  return out.join("\n");
+}
+
+// =====================================================================
+// PENGATURAN
+// =====================================================================
+function renderSet(){
+  if(!state.siap)return;
+  const p=state.profil;
+  document.getElementById("s-nama").textContent=p.nama||"—";
+  document.getElementById("s-level").textContent=({easy:"Easy",medium:"Medium",pro:"Pro"})[p.level]||"—";
+  document.getElementById("i-mulai").value=state.mulai||"";
+  document.getElementById("sw-grup").checked=!!p.izin_grup_status;
+  document.getElementById("sw-adm1").checked=!!p.izin_admin_ringkasan;
+  document.getElementById("sw-adm2").checked=!!p.izin_admin_detail;
+  const hOn=localStorage.getItem("habit_on")==="1";
+  document.getElementById("sw-habit").checked=hOn;
+  document.getElementById("habit-conf").style.display=hOn?"":"none";
+  document.getElementById("i-habits").value=localStorage.getItem("habit_list")||"rokok, alkohol";
+  if(state.grup){
+    document.getElementById("s-grup").textContent=state.grup.nama_group;
+    document.getElementById("s-berlaku").textContent=state.grup.berakhir_pada
+      ?new Date(state.grup.berakhir_pada).toLocaleDateString(lang==="id"?"id-ID":"en-GB")
+      :(lang==="id"?"Tanpa batas":"Unlimited");
+  }
   tampilSync();
 }
-
-async function ubahIzin(kolom, nilai){
-  await sb.from("profiles").update({ [kolom]: nilai }).eq("id", state.user.id);
-  await sb.from("consent_log").insert({ user_id: state.user.id, jenis_izin: kolom, nilai });
-  state.profil[kolom] = nilai;
+async function ubahIzin(kolom,nilai){
+  await sb.from("profiles").update({[kolom]:nilai}).eq("id",state.user.id);
+  await sb.from("consent_log").insert({user_id:state.user.id,jenis_izin:kolom,nilai});
+  state.profil[kolom]=nilai;
 }
-document.getElementById("sw-grup").onchange = e => ubahIzin("izin_grup_status", e.target.checked);
-document.getElementById("sw-adm1").onchange = e => ubahIzin("izin_admin_ringkasan", e.target.checked);
-document.getElementById("sw-adm2").onchange = e => ubahIzin("izin_admin_detail", e.target.checked);
+document.getElementById("sw-grup").onchange=e=>ubahIzin("izin_grup_status",e.target.checked);
+document.getElementById("sw-adm1").onchange=e=>ubahIzin("izin_admin_ringkasan",e.target.checked);
+document.getElementById("sw-adm2").onchange=e=>ubahIzin("izin_admin_detail",e.target.checked);
+document.getElementById("sw-habit").onchange=e=>{
+  localStorage.setItem("habit_on",e.target.checked?"1":"0");
+  document.getElementById("habit-conf").style.display=e.target.checked?"":"none";
+  renderToday();};
+document.getElementById("btn-habits").onclick=()=>{
+  localStorage.setItem("habit_list",document.getElementById("i-habits").value); renderToday();};
+document.getElementById("i-mulai").onchange=async e=>{
+  state.mulai=e.target.value;
+  if(state.programRow){ state.programRow.tanggal_mulai=state.mulai;
+    await sb.from("user_programs").update({tanggal_mulai:state.mulai}).eq("id",state.programRow.id); }
+  renderToday();};
+document.querySelectorAll("[data-theme]").forEach(b=>b.onclick=()=>{
+  const v=b.dataset.theme; localStorage.setItem("theme",v); pasangTema();});
+function pasangTema(){
+  const v=localStorage.getItem("theme")||"auto";
+  if(v==="auto") document.documentElement.removeAttribute("data-theme");
+  else document.documentElement.setAttribute("data-theme",v);
+  document.querySelectorAll("[data-theme]").forEach(b=>b.classList.toggle("on",b.dataset.theme===v));
+}
+
+// =====================================================================
+// TAB
+// =====================================================================
+document.querySelectorAll(".tab").forEach(tb=>tb.onclick=()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("on"));
+  tb.classList.add("on"); show(tb.dataset.view);
+  if(tb.dataset.view==="v-prog") renderProg();
+  if(tb.dataset.view==="v-set") renderSet();
+});
 
 // =====================================================================
 // MULAI
 // =====================================================================
-async function mulai(){
-  const { data:{ session } } = await sb.auth.getSession();
-  if (!session){ show("v-auth"); return; }
-  state.user = session.user;
-
-  let { data: prof } = await sb.from("profiles").select("*").eq("id", state.user.id).maybeSingle();
-  if (!prof){
-    // Baris profil belum ada (mis. akun dibuat sebelum trigger aktif) — buat sekarang.
-    const baru = { id: state.user.id, nama: (state.user.user_metadata||{}).nama || "" };
-    const { data: dibuat } = await sb.from("profiles").upsert(baru).select().maybeSingle();
-    prof = dibuat || baru;
+async function bukaApp(){
+  await pastikanProgram();
+  await muatHari();
+  state.siap=true;
+  document.getElementById("tabs").style.display="";
+  document.getElementById("wrap").classList.remove("noTab");
+  document.getElementById("langbox").style.display="none";
+  try{
+    const {data}=await sb.from("memberships").select("group_id, token_groups(nama_group, berakhir_pada)").limit(1);
+    if(data&&data[0]&&data[0].token_groups){ state.grup=data[0].token_groups; await cacheSet("grup",state.grup); }
+  }catch(e){ state.grup=await cacheGet("grup"); }
+  show("v-today"); renderToday(); renderSet(); kirim();
+}
+async function mulaiApp(){
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session){ show("v-auth"); return; }
+  state.user=session.user;
+  let {data:prof}=await sb.from("profiles").select("*").eq("id",state.user.id).maybeSingle();
+  if(!prof){
+    const baru={id:state.user.id,nama:(state.user.user_metadata||{}).nama||""};
+    const {data:dibuat}=await sb.from("profiles").upsert(baru).select().maybeSingle();
+    prof=dibuat||baru;
   }
-  state.profil = prof || {};
-  if (prof && prof.bahasa && T[prof.bahasa]){ lang = prof.bahasa; localStorage.setItem("lang",lang); applyLang(); }
-  await cacheSet("profil", state.profil);
-
-  kirimAntrean();
-
-  if (!state.profil.onboarding_selesai){ state.step = 0; show("v-onb"); renderOnb(); }
-  else await bukaHome();
+  state.profil=prof;
+  if(prof.bahasa&&T[prof.bahasa]){ lang=prof.bahasa; localStorage.setItem("lang",lang); }
+  applyLang(); kirim();
+  if(!prof.onboarding_selesai){ state.step=0; show("v-onb"); renderOnb(); }
+  else await bukaApp();
 }
 
 (async function(){
-  idb = await openDB();
-  applyLang();
-  if (!(await initSupabase())){ show("v-config"); return; }
-  await mulai();
-  if ("serviceWorker" in navigator) navigator.serviceWorker.register("./sw.js").catch(()=>{});
+  idb=await openDB(); pasangTema(); applyLang();
+  if(!(await initSupabase())){ show("v-config"); return; }
+  await mulaiApp();
+  if("serviceWorker" in navigator) navigator.serviceWorker.register("./sw.js").catch(()=>{});
 })();
 </script>
 </body>

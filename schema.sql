@@ -456,7 +456,11 @@ alter table public.session_attendance enable row level security;
 create policy "profil: lihat milik sendiri" on public.profiles
   for select using (id = auth.uid());
 create policy "profil: ubah milik sendiri" on public.profiles
-  for update using (id = auth.uid());
+  for update using (id = auth.uid()) with check (id = auth.uid());
+-- Diperlukan karena aplikasi memakai upsert: kalau baris profil belum ada
+-- (mis. akun dibuat sebelum trigger aktif), aplikasi membuatnya sendiri.
+create policy "profil: buat milik sendiri" on public.profiles
+  for insert to authenticated with check (id = auth.uid());
 create policy "profil: admin lihat yang mengizinkan" on public.profiles
   for select using (public.is_admin() and izin_admin_ringkasan = true);
 create policy "profil: teman grup lihat yang mengizinkan" on public.profiles
