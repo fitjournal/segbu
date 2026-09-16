@@ -401,8 +401,9 @@
         <label class="sw"><input type="checkbox" id="sw-habit"><span></span></label>
       </div>
       <div id="habit-conf" style="display:none">
-        <label data-t="kebiasaan_dilacak">Yang dilacak (pisahkan koma)</label>
-        <input type="text" id="i-habits" placeholder="rokok, alkohol">
+        <label data-t="kebiasaan_dilacak">Yang dilacak</label>
+        <input type="text" id="i-habits" placeholder="rokok:batang:1, alkohol:ml:50">
+        <div class="faint" style="margin-top:6px" data-t="kebiasaan_format"></div>
         <button class="btn ghost" id="btn-habits" data-t="simpan">Simpan</button>
       </div>
     </div>
@@ -475,7 +476,8 @@ const T = {
   ringkasan_ket:"Salin, lalu tempel ke chat untuk dianalisa.", salin:"Salin Ringkasan Minggu Ini",
   modul:"Modul Opsional", modul_kebiasaan:"Pelacak kebiasaan",
   modul_kebiasaan_ket:"Mencatat rokok, alkohol, atau kebiasaan lain. Mati secara default.",
-  kebiasaan_dilacak:"Yang dilacak (pisahkan koma)", simpan:"Simpan",
+  kebiasaan_dilacak:"Yang dilacak", simpan:"Simpan",
+  kebiasaan_format:"Format: nama:satuan:langkah — dipisah koma. Contoh: rokok:batang:1, alkohol:ml:50. Satuan dan langkah boleh dikosongkan (mis. \"kopi\" saja).",
   tampilan:"Tampilan", ikut_sistem:"Ikut sistem", gelap:"Gelap", terang:"Terang", data:"Data",
   tab_hari:"Hari Ini", tab_progres:"Progres", tab_atur:"Atur",
   offline:"Offline — tersimpan di perangkat", nunggu:"%n menunggu sinkron",
@@ -519,7 +521,8 @@ const T = {
   ringkasan_ket:"Copy, then paste into chat for analysis.", salin:"Copy This Week's Summary",
   modul:"Optional Modules", modul_kebiasaan:"Habit tracker",
   modul_kebiasaan_ket:"Log smoking, alcohol or any other habit. Off by default.",
-  kebiasaan_dilacak:"What to track (comma separated)", simpan:"Save",
+  kebiasaan_dilacak:"What to track", simpan:"Save",
+  kebiasaan_format:"Format: name:unit:step — comma separated. Example: cigarettes:sticks:1, alcohol:ml:50. Unit and step are optional (e.g. just \"coffee\").",
   tampilan:"Appearance", ikut_sistem:"Follow system", gelap:"Dark", terang:"Light", data:"Data",
   tab_hari:"Today", tab_progres:"Progress", tab_atur:"Settings",
   offline:"Offline — saved on device", nunggu:"%n waiting to sync",
@@ -1105,7 +1108,11 @@ function daftarGerak(){
   return {tipe, list:((PROGRAM[lvl]||PROGRAM.easy)[tipe]).map(([id,s,r])=>{
     const g=GERAK[id]||{}; return {id,nama:g.n,set:s,rep:r,bw:g.bw,kg:g.kg,primer:[],sekunder:[]};})};
 }
-function setKey(ex,i){ return state.sets.find(s=>s.exercise_id===ex&&s.set_ke===i); }
+// Gerakan yang sama bisa muncul di program DAN di modul fokus.
+// Tanpa penanda sumber, centangnya akan saling tertukar.
+function setKey(ex,i,sumber="program"){
+  return state.sets.find(s=>s.exercise_id===ex&&s.set_ke===i&&(s.sumber||"program")===sumber);
+}
 
 async function pastikanSesi(label){
   if(state.sesi) return state.sesi;
@@ -1140,9 +1147,9 @@ function renderToday(){
     g.list.forEach(it=>{
       const ex=it.id, d=document.createElement("div"); d.className="ex";
       let dots="";
-      for(let i=1;i<=it.set;i++){const s=setKey(ex,i);
+      for(let i=1;i<=it.set;i++){const s=setKey(ex,i,"program");
         dots+=`<div class="dot ${s&&s.selesai?"on":""}" data-ex="${ex}" data-set="${i}">${s&&s.selesai?"✓":i}</div>`;}
-      const beban=(setKey(ex,1)||{}).beban_kg ?? it.kg ?? "";
+      const beban=(setKey(ex,1,"program")||{}).beban_kg ?? it.kg ?? "";
       d.innerHTML=`<div class="exh"><div class="exn">${L(it.nama)}</div><div class="ext">${it.set}×${it.rep}</div></div>
         <div class="exr">${it.bw?`<span class="ext">${t("tanpa_beban")}</span>`
           :`<input type="number" step="0.5" class="mini" style="width:74px" data-beban="${ex}" value="${beban}"><span class="ext">${t("kg_tangan")}</span>`}
@@ -1153,11 +1160,11 @@ function renderToday(){
     box.querySelectorAll(".dot").forEach(el=>el.onclick=async()=>{
       const ex=el.dataset.ex, i=+el.dataset.set;
       const sesi=await pastikanSesi("Latihan "+g.tipe);
-      let s=setKey(ex,i);
+      let s=setKey(ex,i,"program");
       const bebanEl=box.querySelector(`[data-beban="${ex}"]`);
       const beban=bebanEl?parseFloat(bebanEl.value)||null:null;
       if(!s){ s={id:crypto.randomUUID(),session_id:sesi.id,user_id:state.user.id,
-                 exercise_id:ex,set_ke:i,beban_kg:beban,selesai:true}; state.sets.push(s); }
+                 exercise_id:ex,set_ke:i,beban_kg:beban,selesai:true,sumber:"program"}; state.sets.push(s); }
       else s.selesai=!s.selesai;
       await simpan("session_sets",s);
       renderToday(); simpanStatus();
@@ -1165,15 +1172,16 @@ function renderToday(){
     box.querySelectorAll("[data-beban]").forEach(el=>el.onchange=async()=>{
       const ex=el.dataset.beban, v=parseFloat(el.value)||null;
       const sesi=await pastikanSesi("Latihan "+g.tipe);
-      for(const s of state.sets.filter(x=>x.exercise_id===ex)){ s.beban_kg=v; await simpan("session_sets",s); }
-      if(!state.sets.some(x=>x.exercise_id===ex)){
+      for(const s of state.sets.filter(x=>x.exercise_id===ex&&(x.sumber||"program")==="program")){
+        s.beban_kg=v; await simpan("session_sets",s); }
+      if(!state.sets.some(x=>x.exercise_id===ex&&(x.sumber||"program")==="program")){
         const s={id:crypto.randomUUID(),session_id:sesi.id,user_id:state.user.id,
-                 exercise_id:ex,set_ke:1,beban_kg:v,selesai:false};
+                 exercise_id:ex,set_ke:1,beban_kg:v,selesai:false,sumber:"program"};
         state.sets.push(s); await simpan("session_sets",s);
       }
     });
     box.querySelectorAll("[data-info]").forEach(el=>el.onclick=()=>bukaInfo(el.dataset.info));
-    const semua=g.list.every(it=>{let c=0;for(let i=1;i<=it.set;i++){const s=setKey(it.id,i);if(s&&s.selesai)c++;}return c>=it.set;});
+    const semua=g.list.every(it=>{let c=0;for(let i=1;i<=it.set;i++){const s=setKey(it.id,i,"program");if(s&&s.selesai)c++;}return c>=it.set;});
     const b=document.getElementById("w-done");
     const done=(state.sesi&&state.sesi.selesai)||semua;
     b.textContent=done?t("latihan_selesai"):t("tandai");
@@ -1228,24 +1236,28 @@ function renderToday(){
   const hOn=localStorage.getItem("habit_on")==="1";
   document.getElementById("c-habit").style.display=hOn?"":"none";
   if(hOn){
-    const list=(localStorage.getItem("habit_list")||"rokok,alkohol").split(",").map(s=>s.trim()).filter(Boolean);
+    const list=konfigKebiasaan();
     const hb=document.getElementById("habit-list"); hb.innerHTML="";
-    list.forEach(tipe=>{
-      const rec=state.kebiasaan.find(x=>x.tipe===tipe)||{jumlah:0};
+    list.forEach(k=>{
+      const rec=state.kebiasaan.find(x=>x.tipe===k.nama)||{jumlah:0};
+      const jml=rec.jumlah||0;
       const r=document.createElement("div"); r.className="row";
-      r.innerHTML=`<div class="t">${tipe}</div>
+      r.innerHTML=`<div><div class="t">${k.nama}</div>
+          ${k.langkah>1?`<div class="faint">± ${k.langkah} ${k.satuan}</div>`:""}</div>
         <div style="display:flex;gap:8px;align-items:center">
-          <button class="small" data-h="${tipe}" data-d="-1">–</button>
-          <strong style="min-width:34px;text-align:center">${rec.jumlah||0}</strong>
-          <button class="small" data-h="${tipe}" data-d="1">+</button></div>`;
+          <button class="small" data-h="${k.nama}" data-d="-1">–</button>
+          <strong style="min-width:62px;text-align:center">${jml}${k.satuan?` <span style="font-weight:400;color:var(--faint);font-size:12px">${k.satuan}</span>`:""}</strong>
+          <button class="small" data-h="${k.nama}" data-d="1">+</button></div>`;
       hb.appendChild(r);
     });
     hb.querySelectorAll("[data-h]").forEach(b=>b.onclick=async()=>{
-      const tipe=b.dataset.h, d=+b.dataset.d;
-      let rec=state.kebiasaan.find(x=>x.tipe===tipe);
-      if(!rec){rec={id:crypto.randomUUID(),user_id:state.user.id,tanggal:state.tanggal,tipe,jumlah:0,satuan:"unit"};
-               state.kebiasaan.push(rec);}
-      rec.jumlah=Math.max(0,(rec.jumlah||0)+d);
+      const nama=b.dataset.h, arah=+b.dataset.d;
+      const k=list.find(x=>x.nama===nama)||{langkah:1,satuan:""};
+      let rec=state.kebiasaan.find(x=>x.tipe===nama);
+      if(!rec){rec={id:crypto.randomUUID(),user_id:state.user.id,tanggal:state.tanggal,
+                    tipe:nama,jumlah:0,satuan:k.satuan||"unit"}; state.kebiasaan.push(rec);}
+      rec.satuan=k.satuan||rec.satuan||"unit";
+      rec.jumlah=Math.max(0,(rec.jumlah||0)+arah*k.langkah);
       await simpan("habit_logs",rec); renderToday();
     });
   }
@@ -1275,7 +1287,7 @@ async function simpanStatus(){
   const g=daftarGerak();
   let latihan=false;
   if(g&&state.sets.length){
-    latihan=g.list.every(it=>{let c=0;for(let i=1;i<=it.set;i++){const s=setKey(it.id,i);if(s&&s.selesai)c++;}return c>=it.set;});
+    latihan=g.list.every(it=>{let c=0;for(let i=1;i<=it.set;i++){const s=setKey(it.id,i,"program");if(s&&s.selesai)c++;}return c>=it.set;});
   }
   if(state.sesi&&state.sesi.selesai) latihan=true;
   const row={id:(state.status&&state.status.id)||crypto.randomUUID(),user_id:state.user.id,tanggal:state.tanggal,
@@ -1348,6 +1360,16 @@ async function bukaInfo(exId){
 document.getElementById("modal").onclick=e=>{ if(e.target.id==="modal") e.currentTarget.classList.remove("on"); };
 
 
+
+// Konfigurasi kebiasaan: "nama:satuan:langkah" — mis. "rokok:batang:1, alkohol:ml:50"
+function konfigKebiasaan(){
+  const raw = localStorage.getItem("habit_list") || "rokok:batang:1, alkohol:ml:50";
+  return raw.split(",").map(s=>s.trim()).filter(Boolean).map(s=>{
+    const [nama,satuan,langkah] = s.split(":").map(x=>(x||"").trim());
+    return { nama, satuan: satuan || "", langkah: Math.max(1, parseInt(langkah,10) || 1) };
+  }).filter(x=>x.nama);
+}
+
 // =====================================================================
 // MODUL FOKUS — ditempel di akhir sesi, pilihan per hari
 // =====================================================================
@@ -1396,7 +1418,7 @@ function renderModul(){
     const ex=it.exercises||{}, id=it.exercise_id;
     const d=document.createElement("div"); d.className="ex";
     let dots="";
-    for(let i=1;i<=it.set_count;i++){const s=setKey(id,i);
+    for(let i=1;i<=it.set_count;i++){const s=setKey(id,i,"modul");
       dots+=`<div class="dot ${s&&s.selesai?"on":""}" data-ex="${id}" data-set="${i}">${s&&s.selesai?"✓":i}</div>`;}
     d.innerHTML=`<div class="exh"><div class="exn">${L(ex.nama)||id}</div>
         <div class="ext">${it.set_count}×${it.rep_text}</div></div>
@@ -1407,9 +1429,9 @@ function renderModul(){
   isi.querySelectorAll(".dot").forEach(el=>el.onclick=async()=>{
     const ex=el.dataset.ex, i=+el.dataset.set;
     const sesi=await pastikanSesi(lang==="id"?"Modul":"Module");
-    let s=setKey(ex,i);
+    let s=setKey(ex,i,"modul");
     if(!s){ s={id:crypto.randomUUID(),session_id:sesi.id,user_id:state.user.id,
-               exercise_id:ex,set_ke:i,beban_kg:null,selesai:true}; state.sets.push(s); }
+               exercise_id:ex,set_ke:i,beban_kg:null,selesai:true,sumber:"modul"}; state.sets.push(s); }
     else s.selesai=!s.selesai;
     await simpan("session_sets",s);
     renderModul();
@@ -1558,7 +1580,7 @@ function renderSet(){
   const hOn=localStorage.getItem("habit_on")==="1";
   document.getElementById("sw-habit").checked=hOn;
   document.getElementById("habit-conf").style.display=hOn?"":"none";
-  document.getElementById("i-habits").value=localStorage.getItem("habit_list")||"rokok, alkohol";
+  document.getElementById("i-habits").value=localStorage.getItem("habit_list")||"rokok:batang:1, alkohol:ml:50";
   if(state.grup){
     document.getElementById("s-grup").textContent=state.grup.nama_group;
     document.getElementById("s-berlaku").textContent=state.grup.berakhir_pada
