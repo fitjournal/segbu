@@ -472,6 +472,7 @@ const T = {
   tampilan:"Tampilan", ikut_sistem:"Ikut sistem", gelap:"Gelap", terang:"Terang", data:"Data",
   tab_hari:"Hari Ini", tab_progres:"Progres", tab_atur:"Atur",
   offline:"Offline — tersimpan di perangkat", nunggu:"%n menunggu sinkron",
+  macet:"%n gagal terkirim — buka Atur", macet_s:"macet", antre:"antre", coba_lagi:"Coba lagi", buang:"Buang yang macet",
   latihan_selesai:"✓ Latihan Selesai", tandai:"Tandai Latihan Selesai",
   istirahat:"Istirahat penuh. Tidak ada latihan hari ini.",
   jalan_santai:"Jalan santai — tidak perlu latihan.",
@@ -513,6 +514,7 @@ const T = {
   tampilan:"Appearance", ikut_sistem:"Follow system", gelap:"Dark", terang:"Light", data:"Data",
   tab_hari:"Today", tab_progres:"Progress", tab_atur:"Settings",
   offline:"Offline — saved on device", nunggu:"%n waiting to sync",
+  macet:"%n failed to send — open Settings", macet_s:"stuck", antre:"queued", coba_lagi:"Retry", buang:"Discard stuck",
   latihan_selesai:"✓ Workout Done", tandai:"Mark Workout Done",
   istirahat:"Full rest. No training today.",
   jalan_santai:"Easy walking — no workout needed.",
@@ -567,30 +569,73 @@ async function simpan(tabel, baris, onConflict){
 }
 const antrean = ()=>tx("outbox","readonly",s=>s.getAll()).then(r=>r||[]);
 let mengirim=false;
+const BATAS_GAGAL=6;   // setelah ini item ditandai macet, tidak dicoba otomatis lagi
 async function kirim(){
   if(mengirim||!navigator.onLine||!sb||!state.user) return tampilSync();
   mengirim=true;
   try{
     const items=(await antrean()).sort((a,b)=>a.ts-b.ts);
     for(const it of items){
+      if((it.gagal||0)>=BATAS_GAGAL) continue;          // macet: tunggu tindakan manual
       const q = it.onConflict
         ? sb.from(it.tabel).upsert(it.baris,{onConflict:it.onConflict})
         : sb.from(it.tabel).upsert(it.baris);
       const {error}=await q;
-      if(error){ console.warn("sync",it.tabel,error.message); break; }
+      if(error){
+        // JANGAN hentikan antrean — satu item bermasalah tidak boleh menyandera sisanya
+        it.gagal=(it.gagal||0)+1; it.error=error.message; it.kode=error.code||"";
+        await tx("outbox","readwrite",s=>s.put(it));
+        console.warn("sync gagal:",it.tabel,error.message);
+        continue;
+      }
       await tx("outbox","readwrite",s=>s.delete(it.id));
     }
   } finally { mengirim=false; tampilSync(); }
 }
+async function coba_lagi(){
+  const items=await antrean();
+  for(const it of items){ it.gagal=0; delete it.error; await tx("outbox","readwrite",s=>s.put(it)); }
+  await kirim();
+}
+async function buang_macet(){
+  const items=await antrean();
+  for(const it of items) if((it.gagal||0)>=BATAS_GAGAL)
+    await tx("outbox","readwrite",s=>s.delete(it.id));
+  await tampilSync();
+}
 async function tampilSync(){
-  const el=document.getElementById("sync"); const n=(await antrean()).length;
+  const items=await antrean();
+  const macet=items.filter(x=>(x.gagal||0)>=BATAS_GAGAL);
+  const el=document.getElementById("sync");
   el.className="";
   if(!navigator.onLine){el.textContent=t("offline");el.classList.add("show","offline");}
-  else if(n>0){el.textContent=t("nunggu").replace("%n",n);el.classList.add("show");}
+  else if(macet.length){el.textContent=t("macet").replace("%n",macet.length);el.classList.add("show","offline");}
+  else if(items.length){el.textContent=t("nunggu").replace("%n",items.length);el.classList.add("show");}
+
   const info=document.getElementById("sync-info");
-  if(info) info.textContent = !navigator.onLine ? t("offline")
-    : n>0 ? t("nunggu").replace("%n",n)
-    : (lang==="id"?"Semua tersinkron.":"Everything synced.");
+  if(!info) return;
+  if(!items.length){
+    info.innerHTML = navigator.onLine
+      ? (lang==="id"?"Semua tersinkron.":"Everything synced.")
+      : t("offline");
+    return;
+  }
+  const baris=items.slice(0,5).map(x=>{
+    const st=(x.gagal||0)>=BATAS_GAGAL ? `<span style="color:var(--bad)">${t("macet_s")}</span>`
+            : (x.gagal? `${x.gagal}×` : t("antre"));
+    return `<div style="padding:6px 0;border-top:1px solid var(--line)">
+      <div>${x.tabel} — ${st}</div>
+      ${x.error?`<div style="color:var(--bad);font-size:11.5px;margin-top:2px">${x.error}</div>`:""}
+    </div>`;}).join("");
+  info.innerHTML = `<div>${t("nunggu").replace("%n",items.length)}</div>${baris}
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="small" id="btn-retry">${t("coba_lagi")}</button>
+      ${macet.length?`<button class="small" id="btn-buang" style="color:var(--bad)">${t("buang")}</button>`:""}
+    </div>`;
+  const r=document.getElementById("btn-retry"); if(r) r.onclick=coba_lagi;
+  const b=document.getElementById("btn-buang"); if(b) b.onclick=()=>{
+    if(confirm(lang==="id"?"Buang data yang gagal terkirim? Tidak bisa dibatalkan."
+                          :"Discard data that failed to send? This cannot be undone.")) buang_macet();};
 }
 addEventListener("online",kirim); addEventListener("offline",tampilSync);
 
@@ -657,6 +702,77 @@ const hariKe = (mulai,d)=>Math.floor((new Date(d.getFullYear(),d.getMonth(),d.ge
 const mingguKe = (mulai,d)=>Math.max(1,Math.floor(hariKe(mulai,d)/7)+1);
 const senin = d => addH(d, d.getDay()===0?-6:1-d.getDay());
 function targetLangkah(mg){ return mg<=1?2500:mg<=2?3000:mg<=4?3500:mg<=8?4500:5000; }
+
+
+// =====================================================================
+// PETA OTOT — satu gambar indeks diwarnai ulang lewat canvas
+// muscle-index.png: nilai piksel = nomor kelompok otot
+// muscle-base.png : tubuh abu-abu, serat otot tetap terlihat
+// =====================================================================
+const KELOMPOK = {dada:1,bahu:2,"bahu-belakang":3,"lengan-depan":4,"lengan-belakang":5,
+  "perut-atas":6,"perut-bawah":7,obliq:8,trapezius:9,"punggung-atas":10,"punggung-tengah":11,
+  gluteus:12,"paha-depan":13,"paha-dalam":14,"paha-belakang":15,"betis-depan":16,
+  "betis-belakang":17,leher:18};
+let PETA=null;
+async function muatPeta(){
+  if(PETA) return PETA;
+  const ambil=src=>new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=src;});
+  try{
+    const [base,idx]=await Promise.all([ambil("./muscle-base.png"),ambil("./muscle-index.png")]);
+    const W=base.width,H=base.height;
+    const cb=document.createElement("canvas");cb.width=W;cb.height=H;
+    const xb=cb.getContext("2d",{willReadFrequently:true});xb.drawImage(base,0,0);
+    const ci=document.createElement("canvas");ci.width=W;ci.height=H;
+    const xi=ci.getContext("2d",{willReadFrequently:true});xi.drawImage(idx,0,0);
+    PETA={W,H,base:xb.getImageData(0,0,W,H),idx:xi.getImageData(0,0,W,H)};
+  }catch(e){ PETA=false; }
+  return PETA;
+}
+// Otot dari database bisa berupa nama detail (mis. 'gluteus-maximus').
+// Petakan ke kelompok gambar lewat tabel muscles, dengan cadangan pencocokan awalan.
+let MUSCLE_MAP=null;
+async function petaOtot(){
+  if(MUSCLE_MAP) return MUSCLE_MAP;
+  MUSCLE_MAP={};
+  try{
+    const {data}=await sb.from("muscles").select("id,kelompok,nama");
+    (data||[]).forEach(m=>{MUSCLE_MAP[m.id]={k:m.kelompok,n:m.nama};});
+    await cacheSet("muscles",MUSCLE_MAP);
+  }catch(e){ MUSCLE_MAP=await cacheGet("muscles")||{}; }
+  return MUSCLE_MAP;
+}
+function kelompokDari(id,map){
+  const m=map[id];
+  if(m&&KELOMPOK[m.k]) return m.k;
+  if(KELOMPOK[id]) return id;
+  const k=Object.keys(KELOMPOK).find(x=>id.startsWith(x)||x.startsWith(id.split("-")[0]));
+  return k||null;
+}
+async function gambarPeta(canvas, primer, sekunder){
+  const P=await muatPeta();
+  if(!P){ canvas.style.display="none"; return; }
+  const map=await petaOtot();
+  const pri=new Set(), sek=new Set();
+  (primer||[]).forEach(o=>{const k=kelompokDari(o,map); if(k)pri.add(KELOMPOK[k]);});
+  (sekunder||[]).forEach(o=>{const k=kelompokDari(o,map); if(k&&!pri.has(KELOMPOK[k]))sek.add(KELOMPOK[k]);});
+
+  canvas.width=P.W; canvas.height=P.H; canvas.style.display="";
+  const ctx=canvas.getContext("2d");
+  const out=ctx.createImageData(P.W,P.H);
+  const b=P.base.data, ix=P.idx.data, o=out.data;
+  const PR=[232,98,45], SK=[244,180,142];
+  for(let i=0;i<o.length;i+=4){
+    const g=b[i], kel=ix[i];                    // kanal merah = nilai indeks
+    let col=null;
+    if(pri.has(kel)) col=PR; else if(sek.has(kel)) col=SK;
+    if(col){
+      const sh=0.5+0.5*Math.min(1,(g/255)*1.25); // pertahankan serat otot
+      o[i]=col[0]*sh; o[i+1]=col[1]*sh; o[i+2]=col[2]*sh;
+    } else { o[i]=g; o[i+1]=g; o[i+2]=g; }
+    o[i+3]=255;
+  }
+  ctx.putImageData(out,0,0);
+}
 
 // =====================================================================
 // STATE
@@ -936,17 +1052,55 @@ async function muatHari(){
 // =====================================================================
 // HARI INI
 // =====================================================================
-function daftarGerak(){
+// Program dimuat dari database (Tahap 3). PROGRAM di atas hanya cadangan
+// bila tabel belum diisi atau sedang offline tanpa cache.
+async function muatProgram(){
   const lvl=state.profil.level||"easy";
-  const tipe=jadwalHari(new Date().getDay(), state.profil.hari_per_minggu||3);
+  const pid=lvl+"-12";
+  try{
+    const {data:days}=await sb.from("program_days").select("*").eq("program_id",pid);
+    if(!days||!days.length) throw new Error("kosong");
+    const {data:items}=await sb.from("program_items")
+      .select("*, exercises(id,nama,alat_dibutuhkan,otot_primer,otot_sekunder)")
+      .in("day_id",days.map(d=>d.id));
+    const byDay={};
+    (items||[]).sort((a,b)=>a.urutan-b.urutan).forEach(it=>{(byDay[it.day_id]=byDay[it.day_id]||[]).push(it);});
+    state.program={pid,days,byDay};
+    await cacheSet("program:"+pid,state.program);
+  }catch(e){
+    state.program=await cacheGet("program:"+pid)||null;
+  }
+}
+function daftarGerak(){
+  const now=new Date();
+  const tipe=jadwalHari(now.getDay(), state.profil.hari_per_minggu||3);
   if(tipe!=="A"&&tipe!=="B") return null;
-  return {tipe, list:(PROGRAM[lvl]||PROGRAM.easy)[tipe]};
+  const P=state.program;
+  if(P){
+    const mg=Math.min(12,mingguKe(state.mulai,now));
+    // Latihan A memakai hari-1 di database, Latihan B memakai hari-3
+    const hari = tipe==="A" ? 1 : 3;
+    const day=P.days.find(d=>d.minggu===mg && d.hari===hari);
+    const items=day?(P.byDay[day.id]||[]):[];
+    if(items.length) return {tipe, dbDay:day, list:items.map(it=>{
+      const ex=it.exercises||{};
+      return {id:it.exercise_id, nama:ex.nama||(GERAK[it.exercise_id]||{}).n,
+              set:it.set_count, rep:it.rep_text,
+              bw:!((ex.alat_dibutuhkan||[]).includes("dumbbell")||(ex.alat_dibutuhkan||[]).includes("bar_plate")),
+              kg:(GERAK[it.exercise_id]||{}).kg,
+              primer:ex.otot_primer||[], sekunder:ex.otot_sekunder||[]};})};
+  }
+  const lvl=state.profil.level||"easy";
+  return {tipe, list:((PROGRAM[lvl]||PROGRAM.easy)[tipe]).map(([id,s,r])=>{
+    const g=GERAK[id]||{}; return {id,nama:g.n,set:s,rep:r,bw:g.bw,kg:g.kg,primer:[],sekunder:[]};})};
 }
 function setKey(ex,i){ return state.sets.find(s=>s.exercise_id===ex&&s.set_ke===i); }
 
 async function pastikanSesi(label){
   if(state.sesi) return state.sesi;
-  const row={id:crypto.randomUUID(),user_id:state.user.id,tanggal:state.tanggal,label,selesai:false};
+  const g=daftarGerak();
+  const row={id:crypto.randomUUID(),user_id:state.user.id,tanggal:state.tanggal,label,selesai:false,
+             program_day_id:(g&&g.dbDay)?g.dbDay.id:null};
   state.sesi=row;
   await simpan("workout_sessions",row);
   return row;
@@ -972,14 +1126,14 @@ function renderToday(){
   if(g){
     document.getElementById("w-title").textContent=(lang==="id"?"Latihan ":"Workout ")+g.tipe;
     const box=document.getElementById("w-list"); box.innerHTML="";
-    g.list.forEach(([ex,setn,rep])=>{
-      const info=GERAK[ex]; const d=document.createElement("div"); d.className="ex";
+    g.list.forEach(it=>{
+      const ex=it.id, d=document.createElement("div"); d.className="ex";
       let dots="";
-      for(let i=1;i<=setn;i++){const s=setKey(ex,i);
+      for(let i=1;i<=it.set;i++){const s=setKey(ex,i);
         dots+=`<div class="dot ${s&&s.selesai?"on":""}" data-ex="${ex}" data-set="${i}">${s&&s.selesai?"✓":i}</div>`;}
-      const beban=(setKey(ex,1)||{}).beban_kg ?? info.kg ?? "";
-      d.innerHTML=`<div class="exh"><div class="exn">${L(info.n)}</div><div class="ext">${setn}×${rep}</div></div>
-        <div class="exr">${info.bw?`<span class="ext">${t("tanpa_beban")}</span>`
+      const beban=(setKey(ex,1)||{}).beban_kg ?? it.kg ?? "";
+      d.innerHTML=`<div class="exh"><div class="exn">${L(it.nama)}</div><div class="ext">${it.set}×${it.rep}</div></div>
+        <div class="exr">${it.bw?`<span class="ext">${t("tanpa_beban")}</span>`
           :`<input type="number" step="0.5" class="mini" style="width:74px" data-beban="${ex}" value="${beban}"><span class="ext">${t("kg_tangan")}</span>`}
         <div class="dots">${dots}</div></div>
         <button class="info" data-info="${ex}">${lang==="id"?"Lihat cara melakukan →":"See how to do it →"}</button>`;
@@ -1008,7 +1162,7 @@ function renderToday(){
       }
     });
     box.querySelectorAll("[data-info]").forEach(el=>el.onclick=()=>bukaInfo(el.dataset.info));
-    const semua=g.list.every(([ex,n])=>{let c=0;for(let i=1;i<=n;i++){const s=setKey(ex,i);if(s&&s.selesai)c++;}return c>=n;});
+    const semua=g.list.every(it=>{let c=0;for(let i=1;i<=it.set;i++){const s=setKey(it.id,i);if(s&&s.selesai)c++;}return c>=it.set;});
     const b=document.getElementById("w-done");
     const done=(state.sesi&&state.sesi.selesai)||semua;
     b.textContent=done?t("latihan_selesai"):t("tandai");
@@ -1108,7 +1262,7 @@ async function simpanStatus(){
   const g=daftarGerak();
   let latihan=false;
   if(g&&state.sets.length){
-    latihan=g.list.every(([ex,n])=>{let c=0;for(let i=1;i<=n;i++){const s=setKey(ex,i);if(s&&s.selesai)c++;}return c>=n;});
+    latihan=g.list.every(it=>{let c=0;for(let i=1;i<=it.set;i++){const s=setKey(it.id,i);if(s&&s.selesai)c++;}return c>=it.set;});
   }
   if(state.sesi&&state.sesi.selesai) latihan=true;
   const row={id:(state.status&&state.status.id)||crypto.randomUUID(),user_id:state.user.id,tanggal:state.tanggal,
@@ -1157,16 +1311,26 @@ async function bukaInfo(exId){
     <p class="faint">${lang==="id"?"Detail gerakan belum tersedia offline.":"Exercise detail not available offline."}</p>
     <button class="btn ghost" onclick="document.getElementById('modal').classList.remove('on')">${t("tutup")}</button>`; return; }
   const langkah=(ex.cara_melakukan&&(ex.cara_melakukan[lang]||ex.cara_melakukan.id))||[];
+  const map=await petaOtot();
+  const namaOtot=a=>(a||[]).map(x=>map[x]?L(map[x].n):x).join(", ");
   sheet.innerHTML=`<h3>${L(ex.nama)}</h3>
-    <h2 style="margin-top:14px">${t("cara")}</h2><ol>${langkah.map(s=>`<li>${s}</li>`).join("")}</ol>
+    <canvas id="peta-otot" style="width:100%;height:auto;display:none;margin-top:12px"></canvas>
+    <div id="peta-ket" style="display:flex;gap:14px;justify-content:center;margin-top:6px;font-size:11.5px;color:var(--dim)">
+      <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#e8622d;vertical-align:-1px"></span> ${t("otot_utama")}</span>
+      <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#f4b48e;vertical-align:-1px"></span> ${t("otot_pendukung")}</span>
+    </div>
+    <h2 style="margin-top:16px">${t("cara")}</h2><ol>${langkah.map(s=>`<li>${s}</li>`).join("")}</ol>
     <h2 style="margin-top:14px">${t("salah")}</h2><p style="font-size:14px">${L(ex.kesalahan_umum)}</p>
     <h2 style="margin-top:14px">${t("kenapa")}</h2><p style="font-size:14px">${L(ex.kenapa_penting)}</p>
     <h2 style="margin-top:14px">${t("otot_utama")}</h2>
-    <p style="font-size:14px">${(ex.otot_primer||[]).join(", ")}</p>
+    <p style="font-size:14px">${namaOtot(ex.otot_primer)}</p>
     ${(ex.otot_sekunder||[]).length?`<h2 style="margin-top:12px">${t("otot_pendukung")}</h2>
-      <p style="font-size:14px;color:var(--dim)">${ex.otot_sekunder.join(", ")}</p>`:""}
+      <p style="font-size:14px;color:var(--dim)">${namaOtot(ex.otot_sekunder)}</p>`:""}
     <button class="btn ghost" id="tutup-sheet">${t("tutup")}</button>`;
   document.getElementById("tutup-sheet").onclick=()=>document.getElementById("modal").classList.remove("on");
+  const cv=document.getElementById("peta-otot");
+  await gambarPeta(cv, ex.otot_primer, ex.otot_sekunder);
+  if(cv.style.display==="none") document.getElementById("peta-ket").style.display="none";
 }
 document.getElementById("modal").onclick=e=>{ if(e.target.id==="modal") e.currentTarget.classList.remove("on"); };
 
@@ -1351,6 +1515,13 @@ function pasangTema(){
 // =====================================================================
 // TAB
 // =====================================================================
+document.getElementById("sync").style.pointerEvents="auto";
+document.getElementById("sync").onclick=()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("on"));
+  const tb=document.querySelector('[data-view="v-set"]'); if(tb) tb.classList.add("on");
+  show("v-set"); renderSet();
+  document.getElementById("sync-info").scrollIntoView({behavior:"smooth",block:"center"});
+};
 document.querySelectorAll(".tab").forEach(tb=>tb.onclick=()=>{
   document.querySelectorAll(".tab").forEach(x=>x.classList.remove("on"));
   tb.classList.add("on"); show(tb.dataset.view);
@@ -1363,6 +1534,7 @@ document.querySelectorAll(".tab").forEach(tb=>tb.onclick=()=>{
 // =====================================================================
 async function bukaApp(){
   await pastikanProgram();
+  await muatProgram();
   await muatHari();
   state.siap=true;
   document.getElementById("tabs").style.display="";

@@ -1,6 +1,7 @@
 // Service worker: simpan kerangka aplikasi & aset supaya bisa dibuka offline.
-const CACHE = "fitapp-v1";
-const INTI = ["./", "./index.html", "./manifest.json"];
+const CACHE = "fitapp-v3";
+const INTI = ["./", "./index.html", "./manifest.json",
+  "./muscle-base.png", "./muscle-index.png"];
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(INTI)).then(() => self.skipWaiting()));
