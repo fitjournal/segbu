@@ -1233,7 +1233,7 @@ function renderToday(){
   renderModul();
 
   // kebiasaan opsional
-  const hOn=localStorage.getItem("habit_on")==="1";
+  const hOn=!!state.user && localStorage.getItem(uk("habit_on"))==="1";
   document.getElementById("c-habit").style.display=hOn?"":"none";
   if(hOn){
     const list=konfigKebiasaan();
@@ -1363,11 +1363,21 @@ document.getElementById("modal").onclick=e=>{ if(e.target.id==="modal") e.curren
 
 // Konfigurasi kebiasaan: "nama:satuan:langkah" — mis. "rokok:batang:1, alkohol:ml:50"
 function konfigKebiasaan(){
-  const raw = localStorage.getItem("habit_list") || "rokok:batang:1, alkohol:ml:50";
+  const raw = localStorage.getItem(uk("habit_list")) || "rokok:batang:1, alkohol:ml:50";
   return raw.split(",").map(s=>s.trim()).filter(Boolean).map(s=>{
     const [nama,satuan,langkah] = s.split(":").map(x=>(x||"").trim());
     return { nama, satuan: satuan || "", langkah: Math.max(1, parseInt(langkah,10) || 1) };
   }).filter(x=>x.nama);
+}
+
+
+// Pengaturan lokal harus menempel pada AKUN, bukan pada perangkat.
+// Tanpa ini, pengaturan satu orang bocor ke orang lain yang login di HP sama.
+function uk(kunci){ return kunci+"::"+(state.user?state.user.id:"anon"); }
+function bersihkanKunciLama(){
+  ["habit_on","habit_list"].forEach(k=>localStorage.removeItem(k));
+  Object.keys(localStorage).filter(k=>k.startsWith("modul:")&&!k.includes("::"))
+    .forEach(k=>localStorage.removeItem(k));
 }
 
 // =====================================================================
@@ -1396,7 +1406,7 @@ function modulTersedia(){
     return true;
   });
 }
-const modulKunci = ()=>"modul:"+state.tanggal;
+const modulKunci = ()=>uk("modul:"+state.tanggal);
 function renderModul(){
   const box=document.getElementById("modul-pilih"), isi=document.getElementById("modul-isi");
   const tersedia=modulTersedia();
@@ -1577,10 +1587,10 @@ function renderSet(){
   document.getElementById("sw-grup").checked=!!p.izin_grup_status;
   document.getElementById("sw-adm1").checked=!!p.izin_admin_ringkasan;
   document.getElementById("sw-adm2").checked=!!p.izin_admin_detail;
-  const hOn=localStorage.getItem("habit_on")==="1";
+  const hOn=localStorage.getItem(uk("habit_on"))==="1";
   document.getElementById("sw-habit").checked=hOn;
   document.getElementById("habit-conf").style.display=hOn?"":"none";
-  document.getElementById("i-habits").value=localStorage.getItem("habit_list")||"rokok:batang:1, alkohol:ml:50";
+  document.getElementById("i-habits").value=localStorage.getItem(uk("habit_list"))||"rokok:batang:1, alkohol:ml:50";
   if(state.grup){
     document.getElementById("s-grup").textContent=state.grup.nama_group;
     document.getElementById("s-berlaku").textContent=state.grup.berakhir_pada
@@ -1598,11 +1608,11 @@ document.getElementById("sw-grup").onchange=e=>ubahIzin("izin_grup_status",e.tar
 document.getElementById("sw-adm1").onchange=e=>ubahIzin("izin_admin_ringkasan",e.target.checked);
 document.getElementById("sw-adm2").onchange=e=>ubahIzin("izin_admin_detail",e.target.checked);
 document.getElementById("sw-habit").onchange=e=>{
-  localStorage.setItem("habit_on",e.target.checked?"1":"0");
+  localStorage.setItem(uk("habit_on"),e.target.checked?"1":"0");
   document.getElementById("habit-conf").style.display=e.target.checked?"":"none";
   renderToday();};
 document.getElementById("btn-habits").onclick=()=>{
-  localStorage.setItem("habit_list",document.getElementById("i-habits").value); renderToday();};
+  localStorage.setItem(uk("habit_list"),document.getElementById("i-habits").value); renderToday();};
 document.getElementById("i-mulai").onchange=async e=>{
   state.mulai=e.target.value;
   if(state.programRow){ state.programRow.tanggal_mulai=state.mulai;
@@ -1663,6 +1673,7 @@ async function mulaiApp(){
     prof=dibuat||baru;
   }
   state.profil=prof;
+  bersihkanKunciLama();
   if(prof.bahasa&&T[prof.bahasa]){ lang=prof.bahasa; localStorage.setItem("lang",lang); }
   applyLang(); kirim();
   if(!prof.onboarding_selesai){ state.step=0; show("v-onb"); renderOnb(); }
