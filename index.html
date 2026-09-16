@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Program Latihan</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#14161a">
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#14161a; --panel:#1e2128; --raised:#262a33; --line:#33373f;
+    --text:#eef0f3; --dim:#9aa0ab; --faint:#6b7280;
+    --accent:#e8622d; --accent-soft:#f0a97e; --accent-dim:#4a2e18;
+    --good:#5fbf77; --good-dim:#2c4630; --bad:#e2574c; --bad-dim:#4a2b28;
+    --fd:'Oswald','Arial Narrow',sans-serif; --fb:'Inter',-apple-system,sans-serif;
+  }
+  :root:not([data-theme="light"]){color-scheme:dark}
+  @media (prefers-color-scheme:light){
+    :root:not([data-theme="dark"]){
+      --bg:#f4f3f0;--panel:#fff;--raised:#f7f6f3;--line:#e3e1db;
+      --text:#191a1c;--dim:#5b5e63;--faint:#8a8d92;
+      --accent-dim:#fae3d5;--good-dim:#d9f0dd;--bad-dim:#f9d9d6;
+    }
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text)}
+  body{font-family:var(--fb);-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums;
+       min-height:100vh;padding-bottom:env(safe-area-inset-bottom)}
+  .wrap{max-width:520px;margin:0 auto;padding:max(20px,env(safe-area-inset-top)) 18px 28px}
+
+  h1{font-family:var(--fd);font-size:30px;margin:0 0 4px;line-height:1.15}
+  h2{font-family:var(--fd);font-size:17px;margin:0 0 10px;font-weight:600}
+  p{margin:8px 0;line-height:1.6}
+  .sub{color:var(--dim);font-size:14px;margin-bottom:22px}
+  .faint{color:var(--faint);font-size:12.5px;line-height:1.55}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px;margin-bottom:14px}
+  label{display:block;font-size:13px;color:var(--dim);margin:14px 0 6px}
+  input[type=text],input[type=email],input[type=password],input[type=number],input[type=date],select{
+    width:100%;padding:12px;border-radius:7px;border:1px solid var(--line);
+    background:var(--bg);color:var(--text);font-family:var(--fb);font-size:16px}
+  input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
+
+  button{font-family:var(--fb);cursor:pointer}
+  .btn{width:100%;padding:14px;border-radius:8px;border:none;background:var(--accent);
+       color:#fff;font-family:var(--fd);font-size:16px;font-weight:600;letter-spacing:.3px;margin-top:16px}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--dim);font-family:var(--fb);font-size:14px}
+  .btn.danger{background:var(--bad)}
+  .link{background:none;border:none;color:var(--accent);font-size:14px;padding:10px;width:100%;margin-top:6px}
+
+  .opts{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+  .opt{padding:13px 14px;border:1.5px solid var(--line);border-radius:8px;background:var(--panel);
+       color:var(--text);font-size:15px;text-align:left;width:100%}
+  .opt.on{border-color:var(--accent);background:var(--accent-dim)}
+  .opts.row{flex-direction:row;flex-wrap:wrap}
+  .opts.row .opt{width:auto;flex:1 1 40%}
+
+  .yn{display:flex;gap:8px}
+  .yn button{flex:1;padding:11px;border:1.5px solid var(--line);border-radius:8px;background:var(--panel);color:var(--text);font-size:14px}
+  .yn button.on-yes{border-color:var(--bad);background:var(--bad-dim);color:var(--bad)}
+  .yn button.on-no{border-color:var(--good);background:var(--good-dim);color:var(--good)}
+  .q{padding:14px 0;border-top:1px solid var(--line)}
+  .q:first-child{border-top:none;padding-top:0}
+  .q p{margin:0 0 10px;font-size:14.5px}
+
+  .bar{height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin-bottom:22px}
+  .bar i{display:block;height:100%;background:var(--accent);transition:width .3s}
+
+  .msg{padding:12px 14px;border-radius:8px;font-size:13.5px;margin-top:14px;line-height:1.55}
+  .msg.err{background:var(--bad-dim);color:var(--bad)}
+  .msg.ok{background:var(--good-dim);color:var(--good)}
+  .msg.warn{background:var(--accent-dim);color:var(--accent)}
+
+  .view{display:none}.view.on{display:block}
+  .row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 0;border-top:1px solid var(--line)}
+  .row:first-child{border-top:none}
+  .sw{position:relative;width:46px;height:26px;flex-shrink:0}
+  .sw input{opacity:0;width:0;height:0}
+  .sw span{position:absolute;inset:0;background:var(--line);border-radius:26px;transition:.2s}
+  .sw span:before{content:"";position:absolute;width:20px;height:20px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s}
+  .sw input:checked+span{background:var(--accent)}
+  .sw input:checked+span:before{transform:translateX(20px)}
+
+  #sync{position:fixed;left:50%;transform:translateX(-50%);bottom:14px;z-index:50;
+        padding:7px 14px;border-radius:100px;font-size:12px;font-weight:600;
+        background:var(--raised);border:1px solid var(--line);color:var(--dim);
+        opacity:0;transition:opacity .3s;pointer-events:none}
+  #sync.show{opacity:1}
+  #sync.offline{background:var(--bad-dim);color:var(--bad);border-color:transparent}
+  #sync.ok{background:var(--good-dim);color:var(--good);border-color:transparent}
+
+  .lang{position:absolute;top:18px;right:18px;display:flex;gap:4px}
+  .lang button{padding:5px 9px;font-size:12px;border-radius:5px;border:1px solid var(--line);
+               background:transparent;color:var(--dim)}
+  .lang button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="lang">
+  <button data-lang="id">ID</button><button data-lang="en">EN</button>
+</div>
+
+<div class="wrap">
+
+  <!-- MEMUAT -->
+  <div class="view on" id="v-load">
+    <div style="text-align:center;padding:80px 0;color:var(--faint)" data-t="memuat">Memuat…</div>
+  </div>
+
+  <!-- KONFIG BELUM DIISI -->
+  <div class="view" id="v-config">
+    <h1>Konfigurasi</h1>
+    <div class="card">
+      <p>Isi <code>SUPABASE_URL</code> dan <code>SUPABASE_ANON_KEY</code> di bagian atas blok
+         <code>&lt;script&gt;</code> pada file <code>index.html</code>.</p>
+      <p class="faint">Nilainya ada di dasbor Supabase → Project Settings → API.
+         Gunakan <strong>anon public key</strong>, jangan pernah service_role key.</p>
+    </div>
+  </div>
+
+  <!-- MASUK / DAFTAR -->
+  <div class="view" id="v-auth">
+    <h1 data-t="judul">Program Latihan</h1>
+    <div class="sub" data-t="subjudul">Latihan di rumah, terukur, bertahap.</div>
+
+    <div class="card">
+      <div class="opts row" style="margin-bottom:4px">
+        <button class="opt on" id="tab-login" data-t="masuk">Masuk</button>
+        <button class="opt" id="tab-daftar" data-t="daftar">Daftar</button>
+      </div>
+
+      <div id="form-login">
+        <label data-t="email">Email</label>
+        <input type="email" id="l-email" autocomplete="email">
+        <label data-t="sandi">Kata sandi</label>
+        <input type="password" id="l-pass" autocomplete="current-password">
+        <button class="btn" id="btn-login" data-t="masuk">Masuk</button>
+      </div>
+
+      <div id="form-daftar" style="display:none">
+        <label data-t="kode_grup">Kode grup</label>
+        <input type="text" id="d-kode" autocapitalize="characters" placeholder="ARCELIO-01">
+        <button class="btn ghost" id="btn-cek" data-t="cek_kode">Periksa kode</button>
+        <div id="kode-info"></div>
+
+        <div id="daftar-lanjut" style="display:none">
+          <label data-t="nama">Nama</label>
+          <input type="text" id="d-nama" autocomplete="name">
+          <label data-t="email">Email</label>
+          <input type="email" id="d-email" autocomplete="email">
+          <label data-t="sandi">Kata sandi</label>
+          <input type="password" id="d-pass" autocomplete="new-password">
+          <div class="faint" style="margin-top:6px" data-t="sandi_min">Minimal 8 karakter.</div>
+          <button class="btn" id="btn-daftar" data-t="buat_akun">Buat akun</button>
+        </div>
+      </div>
+      <div id="auth-msg"></div>
+    </div>
+  </div>
+
+  <!-- ONBOARDING -->
+  <div class="view" id="v-onb">
+    <div class="bar"><i id="onb-bar" style="width:0%"></i></div>
+    <div id="onb-step"></div>
+    <div id="onb-msg"></div>
+    <button class="btn" id="onb-next" data-t="lanjut">Lanjut</button>
+    <button class="link" id="onb-back" data-t="kembali">Kembali</button>
+  </div>
+
+  <!-- BERANDA -->
+  <div class="view" id="v-home">
+    <h1 id="home-hi">Halo</h1>
+    <div class="sub" id="home-sub"></div>
+
+    <div class="card">
+      <h2 data-t="status_akun">Status Akun</h2>
+      <div class="row"><span data-t="level">Level</span><strong id="h-level">—</strong></div>
+      <div class="row"><span data-t="grup">Grup</span><strong id="h-grup">—</strong></div>
+      <div class="row"><span data-t="berlaku">Berlaku sampai</span><strong id="h-berlaku">—</strong></div>
+    </div>
+
+    <div class="card">
+      <h2 data-t="privasi">Privasi</h2>
+      <div class="row">
+        <div><div data-t="izin_grup">Teman satu grup boleh melihat status disiplin saya</div>
+             <div class="faint" data-t="izin_grup_ket">Hanya centang selesai/tidak — bukan isi catatan makan atau latihan.</div></div>
+        <label class="sw"><input type="checkbox" id="sw-grup"><span></span></label>
+      </div>
+      <div class="row">
+        <div><div data-t="izin_adm_ring">Admin boleh melihat ringkasan progres saya</div>
+             <div class="faint" data-t="izin_adm_ring_ket">Persentase latihan & tren berat. Tidak termasuk catatan makan, tidur, atau kebiasaan.</div></div>
+        <label class="sw"><input type="checkbox" id="sw-adm1"><span></span></label>
+      </div>
+      <div class="row">
+        <div><div data-t="izin_adm_det">Admin boleh melihat detail latihan saya</div>
+             <div class="faint" data-t="izin_adm_det_ket">Beban dan set per gerakan.</div></div>
+        <label class="sw"><input type="checkbox" id="sw-adm2"><span></span></label>
+      </div>
+      <div class="faint" style="margin-top:12px" data-t="privasi_ket">
+        Jawaban skrining kesehatan Anda tidak pernah bisa dilihat siapa pun, termasuk admin —
+        apa pun pengaturan di atas. Semua izin bisa dimatikan kapan saja.
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 data-t="tahap">Tahap Pembangunan</h2>
+      <p class="faint" data-t="tahap_ket">Fondasi selesai: akun, token grup, onboarding, skrining, penyimpanan offline, dwibahasa.
+      Berikutnya: pustaka gerakan, program 12 minggu, pencatatan harian, peta otot.</p>
+    </div>
+
+    <button class="btn ghost" id="btn-logout" data-t="keluar">Keluar</button>
+  </div>
+
+</div>
+
+<div id="sync"></div>
+
+<script type="module">
+// =====================================================================
+// KONFIGURASI — isi dua nilai ini dari Supabase → Settings → API
+// =====================================================================
+const SUPABASE_URL      = "https://ruuktccgpwgcjjviisxe.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ1dWt0Y2NncHdnY2pqdmlpc3hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk1NTM5NTYsImV4cCI6MjEwNTEyOTk1Nn0.8KagVJu7YqhXM_9JXUZBKmeWxitBIzBICm8tIE9mXOo";
+
+// =====================================================================
+// i18n
+// =====================================================================
+const T = {
+  id:{
+    memuat:"Memuat…", judul:"Program Latihan", subjudul:"Latihan di rumah, terukur, bertahap.",
+    masuk:"Masuk", daftar:"Daftar", email:"Email", sandi:"Kata sandi",
+    kode_grup:"Kode grup", cek_kode:"Periksa kode", nama:"Nama", buat_akun:"Buat akun",
+    sandi_min:"Minimal 8 karakter.", lanjut:"Lanjut", kembali:"Kembali", keluar:"Keluar",
+    status_akun:"Status Akun", level:"Level", grup:"Grup", berlaku:"Berlaku sampai",
+    privasi:"Privasi", tahap:"Tahap Pembangunan",
+    izin_grup:"Teman satu grup boleh melihat status disiplin saya",
+    izin_grup_ket:"Hanya centang selesai/tidak — bukan isi catatan makan atau latihan.",
+    izin_adm_ring:"Admin boleh melihat ringkasan progres saya",
+    izin_adm_ring_ket:"Persentase latihan & tren berat. Tidak termasuk catatan makan, tidur, atau kebiasaan.",
+    izin_adm_det:"Admin boleh melihat detail latihan saya",
+    izin_adm_det_ket:"Beban dan set per gerakan.",
+    privasi_ket:"Jawaban skrining kesehatan Anda tidak pernah bisa dilihat siapa pun, termasuk admin — apa pun pengaturan di atas. Semua izin bisa dimatikan kapan saja.",
+    tahap_ket:"Fondasi selesai: akun, token grup, onboarding, skrining, penyimpanan offline, dwibahasa. Berikutnya: pustaka gerakan, program 12 minggu, pencatatan harian, peta otot.",
+    offline:"Offline — tersimpan di perangkat", nunggu:"%n menunggu sinkron", tersinkron:"Tersinkron"
+  },
+  en:{
+    memuat:"Loading…", judul:"Training Program", subjudul:"Home training, measured, step by step.",
+    masuk:"Sign in", daftar:"Register", email:"Email", sandi:"Password",
+    kode_grup:"Group code", cek_kode:"Check code", nama:"Name", buat_akun:"Create account",
+    sandi_min:"At least 8 characters.", lanjut:"Continue", kembali:"Back", keluar:"Sign out",
+    status_akun:"Account", level:"Level", grup:"Group", berlaku:"Valid until",
+    privasi:"Privacy", tahap:"Build Stage",
+    izin_grup:"Group members may see my consistency status",
+    izin_grup_ket:"Only done/not-done ticks — never your meal or workout details.",
+    izin_adm_ring:"Admin may see my progress summary",
+    izin_adm_ring_ket:"Workout completion & weight trend. Excludes meals, sleep and habits.",
+    izin_adm_det:"Admin may see my workout details",
+    izin_adm_det_ket:"Load and sets per exercise.",
+    privasi_ket:"Your health screening answers can never be read by anyone, including the admin — regardless of the settings above. Every permission can be switched off at any time.",
+    tahap_ket:"Foundation done: accounts, group tokens, onboarding, screening, offline storage, bilingual. Next: exercise library, 12-week programs, daily logging, muscle map.",
+    offline:"Offline — saved on device", nunggu:"%n waiting to sync", tersinkron:"Synced"
+  }
+};
+let lang = localStorage.getItem("lang") || (navigator.language||"id").slice(0,2);
+if (!T[lang]) lang = "id";
+const t = k => (T[lang] && T[lang][k]) || (T.id[k] || k);
+
+function applyLang(){
+  document.documentElement.lang = lang;
+  document.querySelectorAll("[data-t]").forEach(el=>{ el.textContent = t(el.dataset.t); });
+  document.querySelectorAll(".lang button").forEach(b=>b.classList.toggle("on", b.dataset.lang===lang));
+  if (state.step >= 0) renderOnb();
+}
+document.querySelectorAll(".lang button").forEach(b=>{
+  b.addEventListener("click", ()=>{ lang=b.dataset.lang; localStorage.setItem("lang",lang); applyLang(); });
+});
+
+// =====================================================================
+// PENYIMPANAN OFFLINE — IndexedDB + antrean kirim (outbox)
+// Setiap tulisan masuk ke sini DULU, baru menyusul ke server.
+// =====================================================================
+const DB_NAME="fitapp", DB_VER=1;
+let idb = null;
+function openDB(){
+  return new Promise((res,rej)=>{
+    const r = indexedDB.open(DB_NAME, DB_VER);
+    r.onupgradeneeded = e=>{
+      const db = e.target.result;
+      if(!db.objectStoreNames.contains("outbox")) db.createObjectStore("outbox",{keyPath:"id"});
+      if(!db.objectStoreNames.contains("cache"))  db.createObjectStore("cache",{keyPath:"k"});
+    };
+    r.onsuccess = ()=>res(r.result);
+    r.onerror   = ()=>rej(r.error);
+  });
+}
+function tx(store, mode, fn){
+  return new Promise((res,rej)=>{
+    const t = idb.transaction(store, mode), s = t.objectStore(store);
+    const out = fn(s);
+    t.oncomplete = ()=>res(out && out.result !== undefined ? out.result : out);
+    t.onerror    = ()=>rej(t.error);
+  });
+}
+const cacheSet = (k,v)=> tx("cache","readwrite", s=>s.put({k,v}));
+const cacheGet = k => tx("cache","readonly", s=>s.get(k)).then(r=>r&&r.value);
+
+// Simpan perubahan: lokal dulu, antre untuk dikirim.
+async function simpan(tabel, baris){
+  baris.id = baris.id || crypto.randomUUID();      // ID dibuat DI PERANGKAT
+  baris.updated_at = new Date().toISOString();
+  await tx("outbox","readwrite", s=>s.put({ id: crypto.randomUUID(), tabel, baris, ts: Date.now() }));
+  kirimAntrean();
+  return baris;
+}
+async function antreanIsi(){
+  return tx("outbox","readonly", s=>s.getAll()).then(r=>r||[]);
+}
+let sedangKirim = false;
+async function kirimAntrean(){
+  if (sedangKirim || !navigator.onLine || !sb || !state.user) return tampilSync();
+  sedangKirim = true;
+  try{
+    const items = await antreanIsi();
+    for (const it of items){
+      const { error } = await sb.from(it.tabel).upsert(it.baris);
+      if (error) break;                              // gagal → biarkan di antrean
+      await tx("outbox","readwrite", s=>s.delete(it.id));
+    }
+  } finally { sedangKirim = false; tampilSync(); }
+}
+async function tampilSync(){
+  const el = document.getElementById("sync");
+  const n = (await antreanIsi()).length;
+  el.className = "";
+  if (!navigator.onLine){ el.textContent = t("offline"); el.classList.add("show","offline"); }
+  else if (n > 0){ el.textContent = t("nunggu").replace("%n", n); el.classList.add("show"); }
+  else { el.classList.remove("show"); }
+}
+window.addEventListener("online", ()=>{ kirimAntrean(); });
+window.addEventListener("offline", tampilSync);
+
+// =====================================================================
+// SUPABASE
+// =====================================================================
+let sb = null;
+async function initSupabase(){
+  if(!SUPABASE_URL || !SUPABASE_ANON_KEY) return false;
+  const { createClient } = await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");
+  sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth:{ persistSession:true, storage:window.localStorage, autoRefreshToken:true }
+  });
+  return true;
+}
+
+// =====================================================================
+// STATE & NAVIGASI
+// =====================================================================
+const state = { user:null, profil:null, step:-1, jawab:{}, grup:null };
+const show = id => document.querySelectorAll(".view").forEach(v=>v.classList.toggle("on", v.id===id));
+const pesan = (el, teks, jenis="err") =>
+  document.getElementById(el).innerHTML = teks ? `<div class="msg ${jenis}">${teks}</div>` : "";
+
+// =====================================================================
+// AUTH
+// =====================================================================
+document.getElementById("tab-login").onclick = ()=>{
+  document.getElementById("tab-login").classList.add("on");
+  document.getElementById("tab-daftar").classList.remove("on");
+  document.getElementById("form-login").style.display="";
+  document.getElementById("form-daftar").style.display="none";
+  pesan("auth-msg","");
+};
+document.getElementById("tab-daftar").onclick = ()=>{
+  document.getElementById("tab-daftar").classList.add("on");
+  document.getElementById("tab-login").classList.remove("on");
+  document.getElementById("form-daftar").style.display="";
+  document.getElementById("form-login").style.display="none";
+  pesan("auth-msg","");
+};
+
+document.getElementById("btn-cek").onclick = async ()=>{
+  const kode = document.getElementById("d-kode").value.trim();
+  if(!kode) return;
+  const { data, error } = await sb.rpc("cek_token", { p_kode: kode });
+  const box = document.getElementById("kode-info");
+  if (error){ box.innerHTML = `<div class="msg err">${error.message}</div>`; return; }
+  if (!data.ok){
+    const teks = data.error === "kode_tidak_ditemukan"
+      ? (lang==="id"?"Kode tidak ditemukan.":"Code not found.")
+      : data.error === "kode_tidak_aktif"
+      ? (lang==="id"?"Kode sudah tidak aktif.":"Code is no longer active.")
+      : (lang==="id"?"Kuota grup ini sudah penuh.":"This group is full.");
+    box.innerHTML = `<div class="msg err">${teks}</div>`;
+    document.getElementById("daftar-lanjut").style.display="none";
+    return;
+  }
+  // Tampilkan sisa masa berlaku SEBELUM orang terlanjur mendaftar
+  let info = lang==="id"
+    ? `Grup <strong>${data.nama_group}</strong> — sisa ${data.sisa_seat} kursi.`
+    : `Group <strong>${data.nama_group}</strong> — ${data.sisa_seat} seats left.`;
+  if (data.berakhir_pada){
+    const hari = Math.ceil((new Date(data.berakhir_pada) - Date.now())/86400000);
+    info += lang==="id"
+      ? `<br>Periode grup berakhir ${new Date(data.berakhir_pada).toLocaleDateString("id-ID")} — sisa ${hari} hari.`
+      : `<br>Group period ends ${new Date(data.berakhir_pada).toLocaleDateString("en-GB")} — ${hari} days left.`;
+  } else {
+    info += lang==="id" ? "<br>Tanpa batas waktu." : "<br>No time limit.";
+  }
+  box.innerHTML = `<div class="msg ok">${info}</div>`;
+  document.getElementById("daftar-lanjut").style.display="";
+};
+
+document.getElementById("btn-daftar").onclick = async (e)=>{
+  const btn = e.target; btn.disabled = true;
+  try{
+    const kode  = document.getElementById("d-kode").value.trim();
+    const nama  = document.getElementById("d-nama").value.trim();
+    const email = document.getElementById("d-email").value.trim();
+    const pass  = document.getElementById("d-pass").value;
+    if (pass.length < 8){ pesan("auth-msg", t("sandi_min")); return; }
+
+    const { data, error } = await sb.auth.signUp({
+      email, password: pass, options:{ data:{ nama } }
+    });
+    if (error){ pesan("auth-msg", error.message); return; }
+    if (!data.session){
+      pesan("auth-msg", lang==="id"
+        ? "Akun dibuat. Cek email Anda untuk konfirmasi, lalu masuk."
+        : "Account created. Check your email to confirm, then sign in.", "ok");
+      return;
+    }
+    const { data: r } = await sb.rpc("redeem_token", { p_kode: kode });
+    if (r && !r.ok){ pesan("auth-msg", "Token: " + r.error); return; }
+    await mulai();
+  } finally { btn.disabled = false; }
+};
+
+document.getElementById("btn-login").onclick = async (e)=>{
+  const btn = e.target; btn.disabled = true;
+  try{
+    const { error } = await sb.auth.signInWithPassword({
+      email: document.getElementById("l-email").value.trim(),
+      password: document.getElementById("l-pass").value
+    });
+    if (error){ pesan("auth-msg", error.message); return; }
+    await mulai();
+  } finally { btn.disabled = false; }
+};
+
+document.getElementById("btn-logout").onclick = async ()=>{
+  await sb.auth.signOut();
+  location.reload();
+};
+
+// =====================================================================
+// ONBOARDING — identitas, skrining kesehatan, kemampuan, sarana, tujuan
+// =====================================================================
+const SKRINING = [
+  { k:"jantung",  id:"Pernah didiagnosis masalah jantung, atau disarankan dokter hanya berolahraga di bawah pengawasan?", en:"Ever diagnosed with a heart condition, or told to exercise only under supervision?" },
+  { k:"dada",     id:"Nyeri dada saat aktivitas fisik, atau dalam sebulan terakhir saat istirahat?", en:"Chest pain during physical activity, or at rest in the past month?" },
+  { k:"pingsan",  id:"Pernah pingsan atau pusing berat karena aktivitas fisik?", en:"Ever lost balance from dizziness or lost consciousness during activity?" },
+  { k:"sendi",    id:"Masalah tulang atau sendi yang bisa memburuk karena latihan (lutut, punggung, bahu)?", en:"Bone or joint problem that could worsen with exercise (knee, back, shoulder)?" },
+  { k:"obat",     id:"Sedang minum obat tekanan darah atau jantung?", en:"Currently taking blood pressure or heart medication?" },
+  { k:"lain",     id:"Kondisi lain yang membuat aktivitas fisik berisiko bagi Anda?", en:"Any other reason physical activity could be risky for you?" },
+  { k:"hamil",    id:"Sedang hamil atau kurang dari 6 bulan pascamelahirkan?", en:"Pregnant or less than 6 months postpartum?", hanya:"wanita" }
+];
+
+const LANGKAH = [
+  // 0 — identitas
+  { judul:{id:"Tentang Anda",en:"About you"}, render(){
+      return `
+      <h1>${lang==="id"?"Tentang Anda":"About you"}</h1>
+      <div class="sub">${lang==="id"?"Dipakai untuk menyesuaikan program, bukan untuk dibagikan.":"Used to tailor your program, never shared."}</div>
+      <div class="card">
+        <label>${lang==="id"?"Jenis kelamin":"Gender"}</label>
+        <div class="opts row" data-group="gender">
+          ${["pria","wanita","lainnya"].map(g=>`<button class="opt ${state.jawab.gender===g?"on":""}" data-v="${g}">
+            ${lang==="id"?{pria:"Pria",wanita:"Wanita",lainnya:"Lainnya"}[g]:{pria:"Male",wanita:"Female",lainnya:"Other"}[g]}</button>`).join("")}
+        </div>
+        <label>${lang==="id"?"Tanggal lahir":"Date of birth"}</label>
+        <input type="date" id="f-lahir" value="${state.jawab.tanggal_lahir||""}">
+        <label>${lang==="id"?"Tinggi badan (cm)":"Height (cm)"}</label>
+        <input type="number" id="f-tinggi" value="${state.jawab.tinggi_cm||""}" inputmode="decimal">
+      </div>`;
+    },
+    simpan(){
+      state.jawab.tanggal_lahir = document.getElementById("f-lahir").value || null;
+      state.jawab.tinggi_cm = parseFloat(document.getElementById("f-tinggi").value)||null;
+      if(!state.jawab.gender) return lang==="id"?"Pilih jenis kelamin dulu.":"Please pick a gender.";
+    }},
+
+  // 1 — skrining kesehatan
+  { judul:{id:"Skrining Kesehatan",en:"Health Screening"}, render(){
+      const usia = state.jawab.tanggal_lahir
+        ? Math.floor((Date.now()-new Date(state.jawab.tanggal_lahir))/31557600000) : null;
+      state.jawab.usia = usia;
+      const daftar = SKRINING.filter(q=>!q.hanya || q.hanya===state.jawab.gender);
+      return `
+      <h1>${lang==="id"?"Skrining Kesehatan":"Health Screening"}</h1>
+      <div class="sub">${lang==="id"
+        ? "Jawaban ini tidak pernah bisa dilihat siapa pun, termasuk admin. Jawab sejujurnya — inilah yang menjaga keamanan Anda."
+        : "These answers can never be seen by anyone, including the admin. Answer honestly — this is what keeps you safe."}</div>
+      <div class="card">
+        ${daftar.map(q=>`
+          <div class="q">
+            <p>${q[lang]||q.id}</p>
+            <div class="yn" data-q="${q.k}">
+              <button data-v="ya"    class="${state.jawab["s_"+q.k]===true?"on-yes":""}">${lang==="id"?"Ya":"Yes"}</button>
+              <button data-v="tidak" class="${state.jawab["s_"+q.k]===false?"on-no":""}">${lang==="id"?"Tidak":"No"}</button>
+            </div>
+          </div>`).join("")}
+      </div>`;
+    },
+    simpan(){
+      const daftar = SKRINING.filter(q=>!q.hanya || q.hanya===state.jawab.gender);
+      for (const q of daftar){
+        if (state.jawab["s_"+q.k] === undefined)
+          return lang==="id" ? "Mohon jawab semua pertanyaan." : "Please answer every question.";
+      }
+      if (state.jawab.s_hamil === true)
+        return "__HAMIL__";
+    }},
+
+  // 2 — kemampuan saat ini
+  { judul:{id:"Kemampuan Saat Ini",en:"Current Ability"}, render(){
+      const f = (key, opsi) => `<div class="opts" data-group="${key}">
+        ${opsi.map(o=>`<button class="opt ${state.jawab[key]===o.v?"on":""}" data-v="${o.v}">${o[lang]||o.id}</button>`).join("")}</div>`;
+      return `
+      <h1>${lang==="id"?"Kemampuan Saat Ini":"Current Ability"}</h1>
+      <div class="sub">${lang==="id"?"Jawab apa adanya. Mulai terlalu berat adalah penyebab utama orang berhenti.":"Answer honestly. Starting too hard is the main reason people quit."}</div>
+      <div class="card">
+        <label>${lang==="id"?"Olahraga dalam 3 bulan terakhir":"Exercise in the past 3 months"}</label>
+        ${f("frekuensi",[
+          {v:"tidak", id:"Tidak pernah", en:"Never"},
+          {v:"1x",    id:"Sekitar 1× seminggu", en:"About once a week"},
+          {v:"2-3x",  id:"2–3× seminggu", en:"2–3× a week"},
+          {v:"4x",    id:"4× seminggu atau lebih", en:"4× a week or more"}])}
+        <label>${lang==="id"?"Bisa berdiri dari kursi tanpa bantuan tangan?":"Can you stand up from a chair without using your hands?"}</label>
+        ${f("kursi",[
+          {v:"ya",     id:"Ya, mudah", en:"Yes, easily"},
+          {v:"susah",  id:"Bisa, tapi berat", en:"Yes, but it's hard"},
+          {v:"tidak",  id:"Tidak bisa", en:"No"}])}
+        <label>${lang==="id"?"Bisa jalan 10 menit tanpa berhenti?":"Can you walk 10 minutes without stopping?"}</label>
+        ${f("jalan",[
+          {v:"ya",    id:"Ya", en:"Yes"},
+          {v:"susah", id:"Bisa, tapi terengah", en:"Yes, but out of breath"},
+          {v:"tidak", id:"Tidak bisa", en:"No"}])}
+      </div>`;
+    },
+    simpan(){
+      if(!state.jawab.frekuensi||!state.jawab.kursi||!state.jawab.jalan)
+        return lang==="id"?"Mohon jawab semua pertanyaan.":"Please answer every question.";
+    }},
+
+  // 3 — sarana & waktu
+  { judul:{id:"Sarana & Waktu",en:"Equipment & Time"}, render(){
+      const alat = state.jawab.alat||[];
+      const daftarAlat = [
+        {v:"tidak_ada", id:"Tidak ada alat", en:"No equipment"},
+        {v:"kursi",     id:"Kursi & matras", en:"Chair & mat"},
+        {v:"dumbbell",  id:"Dumbbell tetap", en:"Fixed dumbbells"},
+        {v:"bar_plate", id:"Bar + plate", en:"Bar + plates"},
+        {v:"band",      id:"Resistance band", en:"Resistance band"}
+      ];
+      const f = (key, opsi) => `<div class="opts row" data-group="${key}">
+        ${opsi.map(o=>`<button class="opt ${state.jawab[key]==o.v?"on":""}" data-v="${o.v}">${o[lang]||o.id}</button>`).join("")}</div>`;
+      return `
+      <h1>${lang==="id"?"Sarana & Waktu":"Equipment & Time"}</h1>
+      <div class="card">
+        <label>${lang==="id"?"Alat yang Anda punya (boleh lebih dari satu)":"Equipment you have (multiple allowed)"}</label>
+        <div class="opts row" data-multi="alat">
+          ${daftarAlat.map(o=>`<button class="opt ${alat.includes(o.v)?"on":""}" data-v="${o.v}">${o[lang]||o.id}</button>`).join("")}
+        </div>
+        <label>${lang==="id"?"Hari per minggu yang realistis":"Realistic days per week"}</label>
+        ${f("hari",[{v:2,id:"2 hari",en:"2 days"},{v:3,id:"3 hari",en:"3 days"},{v:4,id:"4 hari",en:"4 days"}])}
+        <label>${lang==="id"?"Durasi per sesi":"Session length"}</label>
+        ${f("menit",[{v:15,id:"15 menit",en:"15 min"},{v:25,id:"25 menit",en:"25 min"},{v:40,id:"40 menit",en:"40 min"}])}
+        <label>${lang==="id"?"Waktu latihan":"Training time"}</label>
+        ${f("waktu",[
+          {v:"pagi",id:"Pagi",en:"Morning"},{v:"siang",id:"Siang",en:"Midday"},
+          {v:"sore",id:"Sore",en:"Afternoon"},{v:"malam",id:"Malam",en:"Evening"}])}
+      </div>`;
+    },
+    simpan(){
+      if(!state.jawab.hari||!state.jawab.menit)
+        return lang==="id"?"Mohon lengkapi hari & durasi.":"Please complete days & duration.";
+    }},
+
+  // 4 — tujuan + persetujuan
+  { judul:{id:"Tujuan",en:"Goal"}, render(){
+      const opsi=[
+        {v:"turun_berat", id:"Turun berat badan", en:"Lose weight"},
+        {v:"kekuatan",    id:"Menambah kekuatan", en:"Get stronger"},
+        {v:"energi",      id:"Lebih bertenaga sehari-hari", en:"More daily energy"},
+        {v:"bentuk",      id:"Membentuk area tertentu", en:"Shape a specific area"},
+        {v:"sehat",       id:"Menjaga kesehatan & mobilitas", en:"Stay healthy & mobile"}];
+      return `
+      <h1>${lang==="id"?"Tujuan Utama":"Main Goal"}</h1>
+      <div class="card">
+        <div class="opts" data-group="tujuan">
+          ${opsi.map(o=>`<button class="opt ${state.jawab.tujuan===o.v?"on":""}" data-v="${o.v}">${o[lang]||o.id}</button>`).join("")}
+        </div>
+      </div>
+      <div class="card">
+        <h2>${lang==="id"?"Persetujuan":"Consent"}</h2>
+        <p class="faint">${lang==="id"
+          ? "Aplikasi ini memberikan panduan latihan umum dan <strong>bukan pengganti nasihat medis</strong>. Anda berlatih atas tanggung jawab sendiri. Hentikan latihan bila muncul nyeri tajam, pusing, atau nyeri dada, dan hubungi tenaga medis. Bila Anda punya kondisi kesehatan, konsultasikan ke dokter sebelum memulai."
+          : "This app provides general training guidance and is <strong>not a substitute for medical advice</strong>. You train at your own risk. Stop immediately if you feel sharp pain, dizziness or chest pain, and seek medical help. If you have a health condition, consult a doctor before starting."}</p>
+        <div class="row">
+          <div>${lang==="id"?"Saya sudah membaca dan menyetujui.":"I have read and agree."}</div>
+          <label class="sw"><input type="checkbox" id="f-setuju" ${state.jawab.setuju?"checked":""}><span></span></label>
+        </div>
+      </div>`;
+    },
+    simpan(){
+      state.jawab.setuju = document.getElementById("f-setuju").checked;
+      if(!state.jawab.tujuan) return lang==="id"?"Pilih tujuan utama.":"Pick a main goal.";
+      if(!state.jawab.setuju) return lang==="id"?"Persetujuan wajib dicentang untuk melanjutkan.":"You must agree to continue.";
+    }}
+];
+
+function renderOnb(){
+  const L = LANGKAH[state.step];
+  if(!L) return;
+  document.getElementById("onb-step").innerHTML = L.render();
+  document.getElementById("onb-bar").style.width = ((state.step)/(LANGKAH.length-1)*100)+"%";
+  document.getElementById("onb-back").style.display = state.step===0 ? "none" : "";
+  document.getElementById("onb-next").textContent =
+    state.step===LANGKAH.length-1 ? (lang==="id"?"Selesai":"Finish") : t("lanjut");
+
+  // pilihan tunggal
+  document.querySelectorAll("[data-group]").forEach(g=>{
+    g.querySelectorAll(".opt").forEach(b=>b.addEventListener("click", ()=>{
+      const key = g.dataset.group;
+      state.jawab[key] = isNaN(b.dataset.v) ? b.dataset.v : Number(b.dataset.v);
+      g.querySelectorAll(".opt").forEach(x=>x.classList.remove("on"));
+      b.classList.add("on");
+    }));
+  });
+  // pilihan ganda
+  document.querySelectorAll("[data-multi]").forEach(g=>{
+    g.querySelectorAll(".opt").forEach(b=>b.addEventListener("click", ()=>{
+      const key = g.dataset.multi;
+      const arr = state.jawab[key] || [];
+      const v = b.dataset.v;
+      const i = arr.indexOf(v);
+      if (i>=0) arr.splice(i,1); else arr.push(v);
+      state.jawab[key]=arr; b.classList.toggle("on");
+    }));
+  });
+  // ya/tidak skrining
+  document.querySelectorAll(".yn").forEach(g=>{
+    g.querySelectorAll("button").forEach(b=>b.addEventListener("click", ()=>{
+      state.jawab["s_"+g.dataset.q] = b.dataset.v==="ya";
+      g.querySelectorAll("button").forEach(x=>x.className="");
+      b.className = b.dataset.v==="ya" ? "on-yes" : "on-no";
+    }));
+  });
+}
+
+document.getElementById("onb-back").onclick = ()=>{ if(state.step>0){ state.step--; pesan("onb-msg",""); renderOnb(); } };
+document.getElementById("onb-next").onclick = async ()=>{
+  const err = LANGKAH[state.step].simpan();
+  if (err === "__HAMIL__"){
+    pesan("onb-msg", lang==="id"
+      ? "<strong>Program umum tidak diberikan untuk kondisi ini.</strong> Latihan saat hamil atau pascamelahirkan memerlukan program khusus dari bidan, dokter, atau fisioterapis yang memeriksa Anda langsung. Silakan gunakan aplikasi ini lagi setelah mendapat izin dari mereka."
+      : "<strong>A general program is not provided for this condition.</strong> Training during pregnancy or postpartum needs a specific program from a midwife, doctor or physiotherapist who has examined you. Please return once they have cleared you.", "warn");
+    return;
+  }
+  if (err){ pesan("onb-msg", err); return; }
+  pesan("onb-msg","");
+
+  if (state.step < LANGKAH.length-1){ state.step++; renderOnb(); return; }
+  await selesaikanOnboarding();
+};
+
+function hitungLevel(){
+  const j = state.jawab;
+  const merah = SKRINING.some(q=>j["s_"+q.k]===true);
+  let skor = 0;
+  skor += {tidak:0,"1x":1,"2-3x":2,"4x":3}[j.frekuensi] ?? 0;
+  skor += {ya:2,susah:1,tidak:0}[j.kursi] ?? 0;
+  skor += {ya:2,susah:1,tidak:0}[j.jalan] ?? 0;
+  if (j.usia !== null && j.usia >= 60) skor -= 2;
+  let level = skor >= 6 ? "pro" : skor >= 3 ? "medium" : "easy";
+  // Aturan keras: flag merah atau belum pernah olahraga → tidak boleh mulai di PRO
+  if (merah && level === "pro") level = "medium";
+  if (j.frekuensi === "tidak") level = "easy";
+  if (j.usia !== null && j.usia >= 60 && level === "pro") level = "medium";
+  return { level, merah };
+}
+
+async function selesaikanOnboarding(){
+  const { level, merah } = hitungLevel();
+  const j = state.jawab;
+  const jawabanSkrining = {};
+  SKRINING.forEach(q=>{ if(j["s_"+q.k]!==undefined) jawabanSkrining[q.k]=j["s_"+q.k]; });
+
+  await sb.from("health_screening").insert({
+    user_id: state.user.id,
+    jawaban: jawabanSkrining,
+    ada_flag_merah: merah,
+    disetujui_pengguna: true,
+    versi_disclaimer: "v1-2026-09"
+  });
+
+  const patch = {
+    gender: j.gender, tanggal_lahir: j.tanggal_lahir, tinggi_cm: j.tinggi_cm,
+    level, alat_dimiliki: j.alat||[], hari_per_minggu: j.hari, menit_per_sesi: j.menit,
+    waktu_latihan: j.waktu, tujuan_utama: j.tujuan, bahasa: lang,
+    onboarding_selesai: true, updated_at: new Date().toISOString()
+  };
+  await sb.from("profiles").update(patch).eq("id", state.user.id);
+  state.profil = Object.assign(state.profil||{}, patch);
+
+  if (merah){
+    alert(lang==="id"
+      ? "Ada jawaban yang menandakan risiko kesehatan. Sebaiknya konsultasikan ke dokter sebelum memulai, dan mulailah dari level paling ringan. Hentikan latihan bila muncul nyeri dada, pusing, atau nyeri tajam."
+      : "Some answers indicate a health risk. Please consult a doctor before starting, and begin at the lightest level. Stop training if you feel chest pain, dizziness, or sharp pain.");
+  }
+  await bukaHome();
+}
+
+// =====================================================================
+// BERANDA
+// =====================================================================
+async function bukaHome(){
+  const p = state.profil||{};
+  document.getElementById("home-hi").textContent =
+    (lang==="id"?"Halo, ":"Hi, ") + (p.nama || (state.user.email||"").split("@")[0]);
+  document.getElementById("home-sub").textContent =
+    lang==="id" ? "Fondasi aplikasi sudah aktif." : "App foundation is live.";
+  document.getElementById("h-level").textContent =
+    ({easy:"Easy",medium:"Medium",pro:"Pro"})[p.level] || "—";
+
+  document.getElementById("sw-grup").checked = !!p.izin_grup_status;
+  document.getElementById("sw-adm1").checked = !!p.izin_admin_ringkasan;
+  document.getElementById("sw-adm2").checked = !!p.izin_admin_detail;
+
+  try{
+    const { data } = await sb.from("memberships")
+      .select("group_id, token_groups(nama_group, berakhir_pada)").limit(1);
+    const g = data && data[0] && data[0].token_groups;
+    if (g){
+      document.getElementById("h-grup").textContent = g.nama_group;
+      document.getElementById("h-berlaku").textContent = g.berakhir_pada
+        ? new Date(g.berakhir_pada).toLocaleDateString(lang==="id"?"id-ID":"en-GB")
+        : (lang==="id"?"Tanpa batas":"Unlimited");
+      await cacheSet("grup", g);
+    }
+  }catch(e){
+    const g = await cacheGet("grup");
+    if (g) document.getElementById("h-grup").textContent = g.nama_group;
+  }
+  show("v-home");
+  tampilSync();
+}
+
+async function ubahIzin(kolom, nilai){
+  await sb.from("profiles").update({ [kolom]: nilai }).eq("id", state.user.id);
+  await sb.from("consent_log").insert({ user_id: state.user.id, jenis_izin: kolom, nilai });
+  state.profil[kolom] = nilai;
+}
+document.getElementById("sw-grup").onchange = e => ubahIzin("izin_grup_status", e.target.checked);
+document.getElementById("sw-adm1").onchange = e => ubahIzin("izin_admin_ringkasan", e.target.checked);
+document.getElementById("sw-adm2").onchange = e => ubahIzin("izin_admin_detail", e.target.checked);
+
+// =====================================================================
+// MULAI
+// =====================================================================
+async function mulai(){
+  const { data:{ session } } = await sb.auth.getSession();
+  if (!session){ show("v-auth"); return; }
+  state.user = session.user;
+
+  const { data: prof } = await sb.from("profiles").select("*").eq("id", state.user.id).single();
+  state.profil = prof || {};
+  if (prof && prof.bahasa && T[prof.bahasa]){ lang = prof.bahasa; localStorage.setItem("lang",lang); applyLang(); }
+  await cacheSet("profil", state.profil);
+
+  kirimAntrean();
+
+  if (!state.profil.onboarding_selesai){ state.step = 0; show("v-onb"); renderOnb(); }
+  else await bukaHome();
+}
+
+(async function(){
+  idb = await openDB();
+  applyLang();
+  if (!(await initSupabase())){ show("v-config"); return; }
+  await mulai();
+  if ("serviceWorker" in navigator) navigator.serviceWorker.register("./sw.js").catch(()=>{});
+})();
+</script>
+</body>
+</html>
